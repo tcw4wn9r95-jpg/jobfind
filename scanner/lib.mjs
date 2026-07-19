@@ -73,6 +73,22 @@ const NON_EU_MARKERS = [
   "india", "latam", "latin america", "brazil", "mexico", "argentina", "colombia", "chile",
   "apac", "asia pacific", "singapore", "japan", "china", "hong kong", "philippines",
   "vietnam", "indonesia", "south africa", "nigeria", "middle east", "uae", "israel",
+  // Job boards frequently write "Remote, <City>" with no country name at all
+  // (confirmed in production: a GitLab posting listed "Remote, Bangalore" and
+  // fell through to "uncertain" instead of being excluded). Major non-EU hub
+  // cities close that gap; EU cities are deliberately absent — the neighbor/
+  // eu tiers already handle those.
+  "bangalore", "bengaluru", "mumbai", "delhi", "new delhi", "hyderabad", "pune",
+  "chennai", "gurugram", "gurgaon", "noida",
+  "beijing", "shanghai", "shenzhen", "guangzhou", "hong kong",
+  "tokyo", "osaka", "seoul",
+  "toronto", "vancouver", "montreal",
+  "san francisco", "new york", "seattle", "austin", "chicago", "boston", "los angeles",
+  "sao paulo", "são paulo", "mexico city", "buenos aires",
+  "london", "manchester", "edinburgh",
+  "sydney", "melbourne", "brisbane", "auckland",
+  "lagos", "nairobi", "cairo", "dubai", "tel aviv", "johannesburg",
+  "manila", "jakarta", "ho chi minh", "bangkok",
 ];
 
 // Phrases that name a residency/work-authorization requirement explicitly.
