@@ -65,7 +65,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
         </div>
       </PageHeader>
 
-      <div className="mb-6 flex gap-1 rounded-xl bg-ink-100/80 p-1">
+      <div className="mb-6 flex gap-1 overflow-x-auto rounded-xl bg-ink-100/80 p-1">
         {(
           [
             ["match", "Match analysis"],
@@ -77,7 +77,7 @@ export default function JobPage({ params }: { params: { id: string } }) {
           <button
             key={value}
             onClick={() => setTab(value)}
-            className={`flex-1 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+            className={`flex-1 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-semibold transition ${
               tab === value
                 ? "bg-white text-indigo-700 shadow-card"
                 : "text-ink-500 hover:text-ink-800"
@@ -387,7 +387,7 @@ function ChatTab({
   ];
 
   return (
-    <div className="card flex h-[600px] flex-col animate-rise">
+    <div className="card flex h-[70vh] min-h-[420px] flex-col animate-rise md:h-[600px]">
       <div className="flex-1 space-y-4 overflow-y-auto p-6">
         {messages.length === 0 && (
           <div className="text-center">

@@ -4,12 +4,39 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
-  { href: "/", label: "Dashboard", icon: "◈" },
-  { href: "/profile", label: "My Profile", icon: "☺" },
-  { href: "/jobs", label: "Jobs & Matches", icon: "✦" },
-  { href: "/pipeline", label: "Pipeline", icon: "⬢" },
-  { href: "/contacts", label: "People", icon: "✉" },
+  { href: "/", label: "Dashboard", short: "Home", icon: "◈" },
+  { href: "/profile", label: "My Profile", short: "Profile", icon: "☺" },
+  { href: "/jobs", label: "Jobs & Matches", short: "Jobs", icon: "✦" },
+  { href: "/pipeline", label: "Pipeline", short: "Pipeline", icon: "⬢" },
+  { href: "/contacts", label: "People", short: "People", icon: "✉" },
 ];
+
+export function MobileNav() {
+  const pathname = usePathname();
+  return (
+    <nav
+      className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink-200/70 bg-white/90 backdrop-blur md:hidden"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      {links.map((l) => {
+        const active =
+          l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+        return (
+          <Link
+            key={l.href}
+            href={l.href}
+            className={`flex flex-1 flex-col items-center gap-0.5 py-2 text-[10px] font-semibold ${
+              active ? "text-indigo-600" : "text-ink-400"
+            }`}
+          >
+            <span className="text-lg leading-none">{l.icon}</span>
+            {l.short}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
 
 export function Nav() {
   const pathname = usePathname();

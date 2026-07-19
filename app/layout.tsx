@@ -1,11 +1,28 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import { Nav } from "@/components/nav";
+import { MobileNav, Nav } from "@/components/nav";
 
 export const metadata: Metadata = {
   title: "JobFind — your job search, on offense",
   description:
     "Track roles, score matches with Claude, tailor your CV and land the job.",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "JobFind",
+  },
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/apple-touch-icon.png",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#f6f7fb",
 };
 
 export default function RootLayout({
@@ -18,8 +35,11 @@ export default function RootLayout({
       <body>
         <div className="mx-auto flex min-h-screen max-w-7xl">
           <Nav />
-          <main className="min-w-0 flex-1 px-6 py-8 lg:px-10">{children}</main>
+          <main className="min-w-0 flex-1 px-4 pb-24 pt-6 sm:px-6 md:py-8 md:pb-8 lg:px-10">
+            {children}
+          </main>
         </div>
+        <MobileNav />
       </body>
     </html>
   );

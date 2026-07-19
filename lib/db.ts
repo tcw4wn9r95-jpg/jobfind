@@ -6,7 +6,7 @@ let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
   if (db) return db;
-  const dir = path.join(process.cwd(), "data");
+  const dir = process.env.DATA_DIR || path.join(process.cwd(), "data");
   fs.mkdirSync(dir, { recursive: true });
   db = new Database(path.join(dir, "jobfind.db"));
   db.pragma("journal_mode = WAL");

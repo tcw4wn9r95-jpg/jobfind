@@ -12,29 +12,40 @@ export default function PipelinePage() {
   const [overCol, setOverCol] = useState<string | null>(null);
   const jobs = data?.jobs ?? [];
 
-  async function moveTo(status: string) {
-    if (dragId == null) return;
-    const job = jobs.find((j) => j.id === dragId);
-    setDragId(null);
-    setOverCol(null);
-    if (!job || job.status === status) return;
-    await api(`/api/jobs/${job.id}`, {
+  async function setJobStatus(jobId: number, status: string) {
+    await api(`/api/jobs/${jobId}`, {
       method: "PATCH",
       body: JSON.stringify({ status }),
     });
     reload();
   }
 
+  async function moveTo(status: string) {
+    if (dragId == null) return;
+    const job = jobs.find((j) => j.id === dragId);
+    setDragId(null);
+    setOverCol(null);
+    if (!job || job.status === status) return;
+    await setJobStatus(job.id, status);
+  }
+
+  // Touch devices don't fire HTML5 drag events — give each card step buttons too
+  function step(job: any, dir: -1 | 1) {
+    const idx = COLUMNS.indexOf(job.status);
+    const next = COLUMNS[idx + dir];
+    if (next) setJobStatus(job.id, next);
+  }
+
   return (
     <div>
       <PageHeader
         title="Pipeline"
-        subtitle="Drag cards between stages as things move. A full pipeline is a healthy pipeline."
+        subtitle="Drag cards — or tap the arrows — to move roles between stages. A full pipeline is a healthy pipeline."
       />
       {loading ? (
         <Spinner label="Loading…" />
       ) : (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        <div className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-0 xl:grid xl:grid-cols-6 xl:overflow-visible">
           {COLUMNS.map((col) => {
             const colJobs = jobs.filter((j) => j.status === col);
             const meta = STATUS_META[col];
@@ -47,7 +58,7 @@ export default function PipelinePage() {
                 }}
                 onDragLeave={() => setOverCol((c) => (c === col ? null : c))}
                 onDrop={() => moveTo(col)}
-                className={`flex min-h-[300px] flex-col rounded-2xl border p-3 transition ${
+                className={`flex min-h-[300px] w-64 shrink-0 snap-start flex-col rounded-2xl border p-3 transition xl:w-auto ${
                   overCol === col
                     ? "border-indigo-400 bg-indigo-50/70"
                     : "border-ink-200/60 bg-white/50"
@@ -81,6 +92,32 @@ export default function PipelinePage() {
                         </div>
                       </div>
                       <p className="mt-1 truncate text-xs text-ink-500">{j.company}</p>
+                      <div className="mt-2 flex justify-between gap-1">
+                        <button
+                          aria-label="Move to previous stage"
+                          className={`rounded-lg border border-ink-200 px-2 py-0.5 text-xs font-bold text-ink-500 hover:border-indigo-300 hover:text-indigo-600 ${
+                            COLUMNS.indexOf(j.status) === 0 ? "invisible" : ""
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            step(j, -1);
+                          }}
+                        >
+                          ←
+                        </button>
+                        <button
+                          aria-label="Move to next stage"
+                          className={`rounded-lg border border-ink-200 px-2 py-0.5 text-xs font-bold text-ink-500 hover:border-indigo-300 hover:text-indigo-600 ${
+                            COLUMNS.indexOf(j.status) === COLUMNS.length - 1 ? "invisible" : ""
+                          }`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            step(j, 1);
+                          }}
+                        >
+                          →
+                        </button>
+                      </div>
                     </Link>
                   ))}
                   {colJobs.length === 0 && (

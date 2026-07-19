@@ -36,6 +36,33 @@ npm run dev                  # http://localhost:3000
 ```
 
 Data lives in a local SQLite file at `data/jobfind.db` — no external database.
+(Set `DATA_DIR` to store it elsewhere, e.g. on a mounted volume.)
+
+## Use it on your phone
+
+JobFind is a PWA: mobile layout with a bottom tab bar, installable to your home
+screen, with app icon and standalone (no browser chrome) mode.
+
+**1. Host it** (it needs a Node server + disk for SQLite, so pick a host with a
+persistent volume — Railway is the least-clicks option):
+
+- [Railway](https://railway.app): *New Project → Deploy from GitHub repo* and pick
+  this repo — the `Dockerfile` is detected automatically. Then:
+  - **Variables** → add `ANTHROPIC_API_KEY` (plus the Google Drive vars if you use them)
+  - **Volume** → attach a volume mounted at `/data` (the Dockerfile stores the DB there)
+  - **Settings → Networking** → *Generate Domain* to get your `https://…up.railway.app` URL
+- Render / Fly.io work the same way (Docker deploy + volume at `/data` + env vars).
+
+**2. Add it to your home screen** from the generated URL:
+
+- **iPhone (Safari):** Share button → *Add to Home Screen*
+- **Android (Chrome):** ⋮ menu → *Add to Home screen* (or the install prompt)
+
+It then opens full-screen like a native app.
+
+> **Set `APP_PASSWORD`** when hosting online — it locks the whole app behind a
+> login (you stay signed in for a year per device). Without it anyone with the
+> URL could see your data.
 
 ### Google Drive (optional)
 
