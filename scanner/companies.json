@@ -1,0 +1,6 @@
+{
+  "_comment": "Curated target companies polled directly on their public ATS boards — edit freely. 'board' is the company slug in that ATS's public API. Remove any entry that 404s in the Action logs (companies switch ATS providers).",
+  "greenhouse": ["gitlab", "cloudflare", "datadog", "stripe", "duolingo", "gopuff", "backmarket", "vinted", "mongodb"],
+  "lever": ["spotify", "ecovadis", "swile", "veepee"],
+  "ashby": ["ramp", "linear", "deel", "docker"]
+}

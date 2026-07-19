@@ -10,6 +10,7 @@ import {
   api,
   useApi,
 } from "@/components/ui";
+import { LeadsInbox } from "@/components/leads";
 
 export default function JobsPage() {
   const { data, loading, reload } = useApi<{ jobs: any[] }>("/api/jobs");
@@ -47,6 +48,8 @@ export default function JobsPage() {
         title="Jobs & Matches"
         subtitle="Drop in a job link — I'll read it, score the fit against your profile, and tell you how to win it."
       />
+
+      <LeadsInbox onPromoted={reload} />
 
       <section className="card mb-8 p-6 animate-rise">
         <div className="flex flex-col gap-3 sm:flex-row">
