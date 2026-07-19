@@ -57,10 +57,14 @@ const WORLDWIDE_MARKERS = [
   "worldwide", "anywhere", "global", "any location", "unrestricted", "location agnostic",
 ];
 
-// Explicit non-EU markers — a match in the location FIELD, or one of these
-// terms appearing anywhere, means the role is very unlikely to be open to a
-// Luxembourg-based candidate. This is what actually stops "Remote (US)" or
-// "must be UK-based" postings from being scored as if they were EU-open.
+// Explicit non-EU markers — checked ONLY against the structured location
+// FIELD (ATS-populated, e.g. "Remote (US)"), never the free-text snippet.
+// A job's description almost always mentions countries that have nothing to
+// do with this role's eligibility (a "Global Transformation Team" name, "the
+// world's largest networks", references to other offices) — matching those
+// produced false positives. Snippet-based restriction detection is handled
+// separately by RESTRICTION_PATTERNS, which requires specific residency
+// phrasing instead of a bare word match.
 const NON_EU_MARKERS = [
   "united states", "usa", "u.s.a", "u.s.", "us only", "us-based", "us citizens",
   "(us)", "- us)", " us)", "us timezone", "us time zone", "pst/est", "est/pst",
@@ -84,6 +88,25 @@ function findMarker(haystack, markers) {
   return markers.find((m) => haystack.includes(m)) ?? null;
 }
 
+// The restriction regexes' capture groups are deliberately loose (so they
+// catch "India", "the United States", "South Africa" alike); this trims a
+// raw capture down to just the place name for display, e.g. "india for
+// this position" -> "India". Only affects the label shown to the user —
+// the eligibility check above uses the untrimmed capture.
+const PLACE_STOPWORDS = new Set([
+  "for", "and", "to", "on", "with", "the", "a", "an", "this", "that",
+  "position", "role", "job", "team", "only", "unless", "work", "our", "from",
+]);
+function trimPlace(raw) {
+  const words = [];
+  for (const w of raw.trim().split(/\s+/)) {
+    const clean = w.replace(/[.,;:]+$/, "");
+    if (PLACE_STOPWORDS.has(clean.toLowerCase()) || words.length >= 3) break;
+    words.push(clean);
+  }
+  return words.join(" ") || raw.trim();
+}
+
 /**
  * Classify a lead's geographic fit for a candidate based in `prefs.home`
  * who can also commute from `prefs.commutable` countries. Returns a tier
@@ -95,12 +118,16 @@ export function classifyLocation(lead, prefs = {}) {
   const commutable = (prefs.commutable ?? []).map((c) => c.toLowerCase());
   const field = (lead.location ?? "").toLowerCase();
   const snippet = (lead.snippet ?? "").toLowerCase();
-  const hay = `${field} ${snippet}`;
 
-  const nonEu = findMarker(field, NON_EU_MARKERS) || findMarker(snippet, NON_EU_MARKERS);
+  // 1. Structured field says an explicit non-EU location — authoritative.
+  const nonEu = findMarker(field, NON_EU_MARKERS);
   if (nonEu) {
     return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(nonEu.replace(/[()]/g, ""))} only` };
   }
+  // 2. A specific residency/work-authorization phrase in the description —
+  //    precise grammatical patterns only, so generic mentions of a country
+  //    elsewhere in the text (a team name, a stat, another office) can't
+  //    trigger this by accident.
   for (const pattern of RESTRICTION_PATTERNS) {
     const m = snippet.match(pattern);
     if (!m) continue;
@@ -110,10 +137,14 @@ export function classifyLocation(lead, prefs = {}) {
       commutable.some((c) => place.includes(c)) ||
       EU_WIDE_MARKERS.some((e) => place.includes(e));
     if (!ok) {
-      return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(m[1].trim())} only` };
+      return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(trimPlace(m[1]))} only` };
     }
   }
 
+  // 3. Home / commutable — field is authoritative; snippet is a fallback
+  //    only for these specific, low-false-positive proper nouns (an
+  //    on-site role whose ATS field is blank but whose text names the
+  //    actual office, e.g. "based in our Luxembourg office").
   if (home && field.includes(home)) {
     return { tier: "home", fit: 1, label: NEIGHBOR_LABEL(prefs.home) };
   }
@@ -122,13 +153,20 @@ export function classifyLocation(lead, prefs = {}) {
       return { tier: "neighbor", fit: 0.85, label: `${NEIGHBOR_LABEL(c)} (commutable)` };
     }
   }
-  if (prefs.eu_wide_remote_ok !== false && findMarker(hay, EU_WIDE_MARKERS)) {
+
+  // 4. EU-wide / worldwide remote — trust ONLY the structured location
+  //    field for this. Snippet boilerplate ("global network", "EMEA sales
+  //    team", "the world's largest…") describes the COMPANY, not this
+  //    role's eligibility, and produced false positives: a hybrid NYC/SF
+  //    role was tagged "worldwide" purely because its snippet mentioned a
+  //    "Global Transformation Team".
+  if (prefs.eu_wide_remote_ok !== false && findMarker(field, EU_WIDE_MARKERS)) {
     return { tier: "eu", fit: 0.75, label: "Remote — EU-wide" };
   }
-  if (prefs.worldwide_remote_ok !== false && findMarker(hay, WORLDWIDE_MARKERS)) {
+  if (prefs.worldwide_remote_ok !== false && findMarker(field, WORLDWIDE_MARKERS)) {
     return { tier: "worldwide", fit: 0.7, label: "Remote — worldwide" };
   }
-  if (field.includes("remote") || snippet.includes("remote")) {
+  if (field.includes("remote")) {
     return { tier: "uncertain", fit: 0.35, label: "Remote — region unclear, verify" };
   }
   return { tier: "other", fit: 0, label: lead.location || "Location unclear" };
