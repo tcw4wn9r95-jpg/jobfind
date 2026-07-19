@@ -41,6 +41,55 @@ body {
   }
 }
 
+/* In-app splash: visible only when running as an installed app, then fades.
+   Pure CSS so there's no hydration flash in a normal browser tab. */
+.app-splash {
+  display: none;
+}
+@media (display-mode: standalone) {
+  .app-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background:
+      radial-gradient(900px 420px at 85% -5%, rgba(129, 140, 248, 0.16), transparent 60%),
+      radial-gradient(700px 380px at -10% 5%, rgba(217, 70, 239, 0.1), transparent 55%),
+      #f6f7fb;
+    animation: splashOut 0.45s ease 1s forwards;
+    pointer-events: none;
+  }
+  .app-splash img {
+    width: 96px;
+    height: 96px;
+    border-radius: 22px;
+    filter: drop-shadow(0 8px 20px rgba(99, 102, 241, 0.35));
+    animation: splashPop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+  }
+  .app-splash span {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #161a2b;
+  }
+}
+@keyframes splashOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes splashPop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+}
+
 /* Markdown-ish rendering for CV preview and chat */
 .prose-cv h1 { @apply mb-1 text-2xl font-bold text-ink-900; }
 .prose-cv h2 { @apply mb-2 mt-5 border-b border-ink-200 pb-1 text-base font-bold uppercase tracking-wide text-indigo-800; }
