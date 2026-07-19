@@ -40,7 +40,7 @@ export function makeLead({ title, company, location, url, postedAt, description,
   };
 }
 
-const ACRONYMS = { us: "US", usa: "USA", uk: "UK", eu: "EU", uae: "UAE", apac: "APAC" };
+const ACRONYMS = { us: "US", usa: "USA", uk: "UK", eu: "EU", uae: "UAE", apac: "APAC", nyc: "NYC", sf: "SF" };
 const NEIGHBOR_LABEL = (c) =>
   c
     .trim()
@@ -89,7 +89,24 @@ const NON_EU_MARKERS = [
   "sydney", "melbourne", "brisbane", "auckland",
   "lagos", "nairobi", "cairo", "dubai", "tel aviv", "johannesburg",
   "manila", "jakarta", "ho chi minh", "bangkok",
+  "thailand", "north america",
 ];
+
+// Short, ambiguous country/city codes ("US", "UK", "NYC", "SF") that are
+// only safe to match as a whole word, not a substring — plain .includes()
+// would false-positive on "focus"/"campus"/"status" etc. Field-only, same
+// as NON_EU_MARKERS above. Confirmed necessary in production: "Remote, US",
+// "US Remote" and "SF, SEA, NYC, Remote" all fell through to "uncertain"
+// because the longer-phrase list only matched formats like "us-based" or
+// "(us)", never a bare "US" field — which turned out to be the single most
+// common real-world pattern.
+const NON_EU_SHORT_CODES = ["us", "usa", "uk", "nyc", "sf"];
+function findShortCode(haystack, codes) {
+  for (const c of codes) {
+    if (new RegExp(`\\b${c}\\b`, "i").test(haystack)) return c;
+  }
+  return null;
+}
 
 // Phrases that name a residency/work-authorization requirement explicitly.
 // The captured place is then checked against home/commutable/EU-wide.
@@ -153,7 +170,7 @@ export function classifyLocation(lead, prefs = {}) {
   const snippet = (lead.snippet ?? "").toLowerCase();
 
   // 1. Structured field says an explicit non-EU location — authoritative.
-  const nonEu = findMarker(field, NON_EU_MARKERS);
+  const nonEu = findMarker(field, NON_EU_MARKERS) || findShortCode(field, NON_EU_SHORT_CODES);
   if (nonEu) {
     return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(nonEu.replace(/[()]/g, ""))} only` };
   }
