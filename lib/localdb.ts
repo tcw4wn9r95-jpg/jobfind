@@ -87,6 +87,7 @@ export type Db = {
   contacts: Contact[];
   interactions: Interaction[];
   settings: Settings;
+  dismissed_leads: string[];
   nextId: number;
 };
 
@@ -102,6 +103,7 @@ function emptyDb(): Db {
     contacts: [],
     interactions: [],
     settings: { apiKey: "", model: "claude-sonnet-5" },
+    dismissed_leads: [],
     nextId: 1,
   };
 }

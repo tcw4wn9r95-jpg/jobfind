@@ -1,0 +1,46 @@
+{
+  "_comment": "Generic search intent only — this file is public. The personal, profile-aware matching happens on-device in the app.",
+  "target_titles": [
+    "Senior Program Manager",
+    "Program Manager",
+    "Senior Product Manager",
+    "Product Manager",
+    "Supply Chain Manager",
+    "Head of Supply Chain",
+    "Sustainability Manager",
+    "Senior Operations Manager",
+    "Product Operations"
+  ],
+  "keywords": [
+    "supply chain",
+    "sustainability",
+    "packaging",
+    "circular economy",
+    "program management",
+    "product management",
+    "operations",
+    "S&OP",
+    "logistics",
+    "procurement",
+    "sourcing",
+    "process improvement",
+    "lean",
+    "six sigma",
+    "AI"
+  ],
+  "locations": [
+    "luxembourg",
+    "remote",
+    "europe",
+    "eu",
+    "belgium",
+    "france",
+    "germany",
+    "netherlands",
+    "emea"
+  ],
+  "exclude_title_words": ["intern", "internship", "junior", "working student", "phd", "apprentice"],
+  "min_score": 35,
+  "max_leads": 20,
+  "max_age_days": 30
+}

@@ -1,0 +1,32 @@
+name: Scan for job leads
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # daily ~06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      # GITHUB_REPOSITORY-based vars exist on schedule events too (event payload doesn't)
+      - run: SITE_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}" node scanner/scan.mjs
+      - name: Publish leads to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./scanner/out
+          destination_dir: leads
+          keep_files: false
+          commit_message: "leads: daily scan"
