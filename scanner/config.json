@@ -28,17 +28,14 @@
     "six sigma",
     "AI"
   ],
-  "locations": [
-    "luxembourg",
-    "remote",
-    "europe",
-    "eu",
-    "belgium",
-    "france",
-    "germany",
-    "netherlands",
-    "emea"
-  ],
+  "location_preferences": {
+    "_comment": "home = on-site match; commutable = neighboring countries people actually commute into Luxembourg from; eu_wide_remote_ok/worldwide_remote_ok control whether those broader remote tiers count as a fit.",
+    "home": "Luxembourg",
+    "commutable": ["Belgium", "France", "Germany"],
+    "eu_wide_remote_ok": true,
+    "worldwide_remote_ok": true
+  },
+  "strict_location": true,
   "exclude_title_words": ["intern", "internship", "junior", "working student", "phd", "apprentice"],
   "min_score": 35,
   "max_leads": 20,
