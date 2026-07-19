@@ -131,6 +131,75 @@ export default function SettingsPage() {
         </div>
         {message && <p className="mt-3 text-sm font-medium text-ink-700">{message}</p>}
       </section>
+
+      <VersionCard />
     </div>
+  );
+}
+
+const RUNNING_SHA = process.env.NEXT_PUBLIC_BUILD_SHA || "dev";
+const RUNNING_BUILT_AT = process.env.NEXT_PUBLIC_BUILD_TIME || "";
+
+function VersionCard() {
+  const [status, setStatus] = useState<
+    "idle" | "checking" | "latest" | "outdated" | "error"
+  >("idle");
+  const [latestSha, setLatestSha] = useState<string | null>(null);
+
+  async function checkForUpdates() {
+    setStatus("checking");
+    try {
+      const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+      // no-store: this file is small and must never be served from a stale
+      // cache, unlike the app shell itself which browsers/PWAs hold onto.
+      const res = await fetch(`${base}/version.json?t=${Date.now()}`, {
+        cache: "no-store",
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setLatestSha(data.sha);
+      setStatus(data.sha === RUNNING_SHA ? "latest" : "outdated");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  return (
+    <section className="card mt-6 max-w-2xl p-6 animate-rise">
+      <h2 className="font-bold text-ink-900">App version</h2>
+      <p className="mt-1 text-sm text-ink-500">
+        Running build{" "}
+        <code className="rounded bg-ink-100 px-1.5 py-0.5 text-xs font-semibold text-ink-700">
+          {RUNNING_SHA}
+        </code>
+        {RUNNING_BUILT_AT && ` · built ${RUNNING_BUILT_AT.replace("T", " ").slice(0, 16)} UTC`}
+      </p>
+      <button className="btn-secondary mt-4" onClick={checkForUpdates} disabled={status === "checking"}>
+        {status === "checking" ? "Checking…" : "Check for updates"}
+      </button>
+      {status === "latest" && (
+        <p className="mt-3 text-sm font-medium text-emerald-600">
+          ✓ You're on the latest version.
+        </p>
+      )}
+      {status === "outdated" && (
+        <div className="mt-3 text-sm">
+          <p className="font-medium text-amber-600">
+            A newer version is live (build {latestSha}) — this install is behind.
+          </p>
+          <p className="mt-1 text-ink-500">
+            Remove JobFind from your home screen and re-add it from the site to update: your
+            data stays put, only the app code refreshes. (A plain browser reload sometimes
+            works too, but installed home-screen apps often hold onto the old code until
+            reinstalled.)
+          </p>
+        </div>
+      )}
+      {status === "error" && (
+        <p className="mt-3 text-sm font-medium text-rose-600">
+          Couldn't reach the update check — you may be offline.
+        </p>
+      )}
+    </section>
   );
 }

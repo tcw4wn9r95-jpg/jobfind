@@ -22,9 +22,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Write version info
+        run: |
+          echo "SHA=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+          echo "BUILT_AT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
       - run: npm run build
         env:
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
+          NEXT_PUBLIC_BUILD_SHA: ${{ env.SHA }}
+          NEXT_PUBLIC_BUILD_TIME: ${{ env.BUILT_AT }}
+      - name: Publish version.json (always fetched fresh, never bundled/cached with the app shell)
+        run: |
+          echo "{\"sha\":\"${SHA}\",\"built_at\":\"${BUILT_AT}\"}" > out/version.json
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
