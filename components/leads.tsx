@@ -14,6 +14,16 @@ type Lead = {
   snippet: string;
   source: string;
   score: number;
+  location_tier?: string;
+  location_note?: string;
+};
+
+const LOCATION_CHIP: Record<string, string> = {
+  home: "bg-emerald-50 text-emerald-700",
+  neighbor: "bg-emerald-50 text-emerald-700",
+  eu: "bg-indigo-50 text-indigo-700",
+  worldwide: "bg-indigo-50 text-indigo-700",
+  uncertain: "bg-amber-50 text-amber-700",
 };
 
 /**
@@ -105,31 +115,40 @@ export function LeadsInbox({ onPromoted }: { onPromoted: () => void }) {
       {error && <p className="mb-3 text-sm font-medium text-rose-600">{error}</p>}
       <ul className="space-y-2.5">
         {visible.map((lead) => (
-          <li
-            key={lead.id}
-            className="flex flex-wrap items-center gap-3 rounded-xl border border-ink-200/70 p-3"
-          >
-            <span
-              className="w-10 shrink-0 text-center text-sm font-extrabold text-ink-700"
-              title="Scanner heuristic score — tap Analyse for the real Claude match"
-            >
-              {lead.score}
-            </span>
-            <div className="min-w-0 flex-1">
-              <a
-                href={lead.url}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm font-semibold text-ink-900 hover:text-indigo-700 hover:underline"
+          <li key={lead.id} className="rounded-xl border border-ink-200/70 p-3">
+            <div className="flex items-start gap-3">
+              <span
+                className="w-10 shrink-0 pt-0.5 text-center text-sm font-extrabold text-ink-700"
+                title="Scanner heuristic score — tap Analyse for the real Claude match"
               >
-                {lead.title} ↗
-              </a>
-              <p className="truncate text-xs text-ink-500">
-                {[lead.company, lead.location].filter(Boolean).join(" · ")}
-                {lead.posted_at ? ` · ${lead.posted_at}` : ""}
-              </p>
+                {lead.score}
+              </span>
+              <div className="min-w-0 flex-1">
+                <a
+                  href={lead.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-semibold text-ink-900 hover:text-indigo-700 hover:underline"
+                >
+                  {lead.title} ↗
+                </a>
+                <p className="mt-0.5 text-sm font-semibold text-ink-700">
+                  {lead.company || "Unknown company"}
+                </p>
+                <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+                  <span
+                    className={`chip ${LOCATION_CHIP[lead.location_tier ?? ""] ?? "bg-ink-100 text-ink-600"}`}
+                    title={lead.location || undefined}
+                  >
+                    📍 {lead.location_note || lead.location || "Location unclear"}
+                  </span>
+                  {lead.posted_at && (
+                    <span className="text-xs text-ink-400">{lead.posted_at}</span>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="flex shrink-0 gap-2">
+            <div className="mt-3 flex justify-end gap-2">
               <button
                 className="btn-primary !px-3 !py-1.5 text-xs"
                 onClick={() => analyse(lead)}

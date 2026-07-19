@@ -40,6 +40,100 @@ export function makeLead({ title, company, location, url, postedAt, description,
   };
 }
 
+const ACRONYMS = { us: "US", usa: "USA", uk: "UK", eu: "EU", uae: "UAE", apac: "APAC" };
+const NEIGHBOR_LABEL = (c) =>
+  c
+    .trim()
+    .split(/\s+/)
+    .map((w) => ACRONYMS[w.toLowerCase()] ?? w.replace(/\b\w/, (ch) => ch.toUpperCase()))
+    .join(" ");
+
+const EU_WIDE_MARKERS = [
+  "eu-wide", "eu wide", "within the eu", "across the eu", "anywhere in europe",
+  "remote europe", "remote (eu)", "remote - eu", "remote, eu", "europe-wide",
+  "european union", "emea", "eea", "schengen", "benelux",
+];
+const WORLDWIDE_MARKERS = [
+  "worldwide", "anywhere", "global", "any location", "unrestricted", "location agnostic",
+];
+
+// Explicit non-EU markers — a match in the location FIELD, or one of these
+// terms appearing anywhere, means the role is very unlikely to be open to a
+// Luxembourg-based candidate. This is what actually stops "Remote (US)" or
+// "must be UK-based" postings from being scored as if they were EU-open.
+const NON_EU_MARKERS = [
+  "united states", "usa", "u.s.a", "u.s.", "us only", "us-based", "us citizens",
+  "(us)", "- us)", " us)", "us timezone", "us time zone", "pst/est", "est/pst",
+  "united kingdom", "uk only", "uk-based", "(uk)",
+  "canada", "australia", "new zealand",
+  "india", "latam", "latin america", "brazil", "mexico", "argentina", "colombia", "chile",
+  "apac", "asia pacific", "singapore", "japan", "china", "hong kong", "philippines",
+  "vietnam", "indonesia", "south africa", "nigeria", "middle east", "uae", "israel",
+];
+
+// Phrases that name a residency/work-authorization requirement explicitly.
+// The captured place is then checked against home/commutable/EU-wide.
+const RESTRICTION_PATTERNS = [
+  /(?:must|need to)\s+be\s+(?:based|located|residing|a resident)\s+in\s+([a-z][a-z .]{2,40})/i,
+  /(?:candidates?|applicants?)\s+must\s+(?:be\s+)?(?:based|located|reside)\s+in\s+([a-z][a-z .]{2,40})/i,
+  /authoriz(?:ed|ation)\s+to\s+work\s+in\s+(?:the\s+)?([a-z][a-z .]{2,40})/i,
+  /open\s+only\s+to\s+(?:candidates|residents)\s+(?:based\s+|located\s+)?in\s+([a-z][a-z .]{2,40})/i,
+];
+
+function findMarker(haystack, markers) {
+  return markers.find((m) => haystack.includes(m)) ?? null;
+}
+
+/**
+ * Classify a lead's geographic fit for a candidate based in `prefs.home`
+ * who can also commute from `prefs.commutable` countries. Returns a tier
+ * used both for hard filtering (scoreLead) and for a human-readable chip
+ * in the UI, so the reasoning is visible, not just the exclusion.
+ */
+export function classifyLocation(lead, prefs = {}) {
+  const home = (prefs.home ?? "").toLowerCase();
+  const commutable = (prefs.commutable ?? []).map((c) => c.toLowerCase());
+  const field = (lead.location ?? "").toLowerCase();
+  const snippet = (lead.snippet ?? "").toLowerCase();
+  const hay = `${field} ${snippet}`;
+
+  const nonEu = findMarker(field, NON_EU_MARKERS) || findMarker(snippet, NON_EU_MARKERS);
+  if (nonEu) {
+    return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(nonEu.replace(/[()]/g, ""))} only` };
+  }
+  for (const pattern of RESTRICTION_PATTERNS) {
+    const m = snippet.match(pattern);
+    if (!m) continue;
+    const place = m[1].trim().toLowerCase();
+    const ok =
+      (home && place.includes(home)) ||
+      commutable.some((c) => place.includes(c)) ||
+      EU_WIDE_MARKERS.some((e) => place.includes(e));
+    if (!ok) {
+      return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(m[1].trim())} only` };
+    }
+  }
+
+  if (home && field.includes(home)) {
+    return { tier: "home", fit: 1, label: NEIGHBOR_LABEL(prefs.home) };
+  }
+  for (const c of commutable) {
+    if (field.includes(c) || snippet.includes(c)) {
+      return { tier: "neighbor", fit: 0.85, label: `${NEIGHBOR_LABEL(c)} (commutable)` };
+    }
+  }
+  if (prefs.eu_wide_remote_ok !== false && findMarker(hay, EU_WIDE_MARKERS)) {
+    return { tier: "eu", fit: 0.75, label: "Remote — EU-wide" };
+  }
+  if (prefs.worldwide_remote_ok !== false && findMarker(hay, WORLDWIDE_MARKERS)) {
+    return { tier: "worldwide", fit: 0.7, label: "Remote — worldwide" };
+  }
+  if (field.includes("remote") || snippet.includes("remote")) {
+    return { tier: "uncertain", fit: 0.35, label: "Remote — region unclear, verify" };
+  }
+  return { tier: "other", fit: 0, label: lead.location || "Location unclear" };
+}
+
 function tokens(s) {
   return new Set(
     s
@@ -51,8 +145,11 @@ function tokens(s) {
 }
 
 /**
- * Heuristic 0–100 score. 40 title fit, 30 keyword hits, 20 location fit,
- * 10 recency; hard exclusions return -1.
+ * Heuristic 0–100 score: 35 title fit, 20 keyword hits, 35 location fit,
+ * 10 recency. Hard exclusions (wrong seniority, stale, explicit
+ * non-EU/non-Luxembourg restriction, or — unless strict_location is
+ * disabled — an unmatched location with no remote/EU signal at all)
+ * return -1.
  */
 export function scoreLead(lead, config) {
   const title = lead.title.toLowerCase();
@@ -64,6 +161,10 @@ export function scoreLead(lead, config) {
     const age = (Date.now() - Date.parse(lead.posted_at)) / 86400000;
     if (age > config.max_age_days) return -1;
   }
+
+  const loc = classifyLocation(lead, config.location_preferences ?? {});
+  if (loc.tier === "restricted") return -1;
+  if (config.strict_location !== false && loc.tier === "other") return -1;
 
   // Title: best word-overlap with any target title
   const titleTokens = tokens(title);
@@ -83,28 +184,17 @@ export function scoreLead(lead, config) {
   }
   const kwFit = Math.min(kw / 4, 1);
 
-  // The location FIELD is the real signal; a mention buried in the
-  // description ("...across EMEA...") only earns half credit — otherwise
-  // on-site roles anywhere score as if they were EU/remote.
-  const locField = lead.location.toLowerCase();
-  const locSnippet = lead.snippet.toLowerCase();
-  const locs = (config.locations ?? []).map((l) => l.toLowerCase());
-  const locFit = locs.some((l) => locField.includes(l))
-    ? 1
-    : locs.some((l) => locSnippet.includes(l))
-      ? 0.5
-      : 0;
-
   let recency = 0.5;
   if (lead.posted_at) {
     const age = (Date.now() - Date.parse(lead.posted_at)) / 86400000;
     recency = age <= 7 ? 1 : age <= 14 ? 0.7 : 0.3;
   }
 
-  return Math.round(40 * titleFit + 30 * kwFit + 20 * locFit + 10 * recency);
+  return Math.round(35 * titleFit + 20 * kwFit + 35 * loc.fit + 10 * recency);
 }
 
-/** Score, filter, dedupe against seen ids, sort, cap. */
+/** Score, filter, dedupe against seen ids, sort, cap. Attaches the
+ *  location tier/label so the UI can show why a lead was included. */
 export function selectLeads(rawLeads, config, seenIds) {
   const seen = new Set(seenIds);
   const byUrl = new Map();
@@ -113,7 +203,13 @@ export function selectLeads(rawLeads, config, seenIds) {
     if (seen.has(lead.id) || byUrl.has(lead.url)) continue;
     const score = scoreLead(lead, config);
     if (score < (config.min_score ?? 35)) continue;
-    byUrl.set(lead.url, { ...lead, score });
+    const loc = classifyLocation(lead, config.location_preferences ?? {});
+    byUrl.set(lead.url, {
+      ...lead,
+      score,
+      location_tier: loc.tier,
+      location_note: loc.label,
+    });
   }
   return [...byUrl.values()]
     .sort((a, b) => b.score - a.score)
