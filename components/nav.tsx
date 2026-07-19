@@ -44,9 +44,12 @@ export function Nav() {
   return (
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-ink-200/60 px-4 py-8 md:flex">
       <Link href="/" className="mb-10 flex items-center gap-2.5 px-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-fuchsia-500 text-lg font-bold text-white shadow-md shadow-indigo-500/30">
-          J
-        </span>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/icon-192.png`}
+          alt=""
+          className="h-9 w-9 rounded-xl shadow-md shadow-indigo-500/30"
+        />
         <span className="text-lg font-extrabold tracking-tight text-ink-900">
           JobFind
         </span>
