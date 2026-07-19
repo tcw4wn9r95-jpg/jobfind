@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { PageHeader, ScoreRing, Spinner, StatusChip, api, useApi } from "@/components/ui";
+import { loadDb } from "@/lib/localdb";
 
 const greetings = [
   "Let's find you something great.",
@@ -31,6 +33,8 @@ export default function Dashboard() {
       )
     : null;
   const hasProfile = (profileData?.profile?.raw_cv ?? "").length > 50;
+  const [hasKey, setHasKey] = useState(true);
+  useEffect(() => setHasKey(Boolean(loadDb().settings.apiKey)), []);
   const greeting = greetings[new Date().getDate() % greetings.length];
   const today = new Date().toISOString().slice(0, 10);
   const due = (followUps?.interactions ?? []).filter(
@@ -51,6 +55,21 @@ export default function Dashboard() {
           + Add a job
         </Link>
       </PageHeader>
+
+      {!hasKey && (
+        <Link
+          href="/settings"
+          className="card mb-6 flex items-center justify-between gap-4 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-5 transition hover:shadow-lift"
+        >
+          <div>
+            <p className="font-bold text-amber-900">First: add your Anthropic API key</p>
+            <p className="mt-0.5 text-sm text-ink-500">
+              It stays on this device and unlocks match scoring, CV tailoring and chat.
+            </p>
+          </div>
+          <span className="btn-primary shrink-0">Open Settings →</span>
+        </Link>
+      )}
 
       {!hasProfile && (
         <Link
@@ -148,7 +167,7 @@ export default function Dashboard() {
               {best.map((j) => (
                 <li key={j.id}>
                   <Link
-                    href={`/jobs/${j.id}`}
+                    href={`/job/?id=${j.id}`}
                     className="flex items-center gap-4 rounded-xl border border-ink-200/70 p-3 transition hover:border-indigo-300 hover:shadow-card"
                   >
                     <ScoreRing score={j.score} size={52} />

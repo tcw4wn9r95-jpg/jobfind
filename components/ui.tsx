@@ -203,22 +203,26 @@ export function mdToHtml(md: string): string {
   return out.join("\n");
 }
 
-/** Fetch JSON with basic error surfacing */
+/**
+ * Same call signature the components always used, but routed to the
+ * in-browser data layer instead of a server. Errors carry `.data`
+ * (e.g. { needsPaste: true }) exactly as before.
+ */
 export async function api<T = any>(
   url: string,
   init?: RequestInit
 ): Promise<T> {
-  const res = await fetch(url, {
-    ...init,
-    headers: { "Content-Type": "application/json", ...init?.headers },
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    const err: any = new Error(data.error || `Request failed (${res.status})`);
-    err.data = data;
+  const { localApi, ApiError } = await import("@/lib/localapi");
+  try {
+    return await localApi(url, {
+      method: init?.method ?? "GET",
+      body: typeof init?.body === "string" ? JSON.parse(init.body) : undefined,
+    });
+  } catch (e: any) {
+    const err: any = new Error(e.message);
+    err.data = e instanceof ApiError ? e.data : {};
     throw err;
   }
-  return data;
 }
 
 export function useApi<T = any>(url: string): {
