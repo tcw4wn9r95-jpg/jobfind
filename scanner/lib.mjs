@@ -10,13 +10,20 @@ export function leadId(url) {
 }
 
 export function stripHtml(s) {
-  return (s ?? "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&#\d+;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return (
+    (s ?? "")
+      // decode entities first — some boards double-encode their HTML
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;|&apos;/g, "'")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&#\d+;/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 /** Normalize a raw job into the lead shape the app consumes. */
@@ -76,8 +83,17 @@ export function scoreLead(lead, config) {
   }
   const kwFit = Math.min(kw / 4, 1);
 
-  const locHay = `${lead.location} ${lead.snippet}`.toLowerCase();
-  const locFit = (config.locations ?? []).some((l) => locHay.includes(l.toLowerCase())) ? 1 : 0;
+  // The location FIELD is the real signal; a mention buried in the
+  // description ("...across EMEA...") only earns half credit — otherwise
+  // on-site roles anywhere score as if they were EU/remote.
+  const locField = lead.location.toLowerCase();
+  const locSnippet = lead.snippet.toLowerCase();
+  const locs = (config.locations ?? []).map((l) => l.toLowerCase());
+  const locFit = locs.some((l) => locField.includes(l))
+    ? 1
+    : locs.some((l) => locSnippet.includes(l))
+      ? 0.5
+      : 0;
 
   let recency = 0.5;
   if (lead.posted_at) {
