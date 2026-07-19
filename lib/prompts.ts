@@ -63,16 +63,18 @@ Rewrite the CV tailored to this role. HARD RULES:
 
 1. NEVER invent, exaggerate or fabricate anything: no new employers, titles, dates, degrees, certifications, metrics or skills. Every fact must come from the candidate's provided material. If a number or detail isn't in the source, don't make one up.
 2. Tailoring means selecting, reordering and rephrasing what is true: lead with the most relevant experience, mirror the job's terminology where it genuinely applies to the candidate, trim what's irrelevant to this role.
-3. Write like a strong human writer, not like an AI. Concretely: vary sentence and bullet structure; no buzzword soup ("results-driven", "synergy", "leverage", "passionate", "proven track record"); plain strong verbs; specific over abstract. It should read like the candidate on their best day.
+3. Write like a strong human writer, not like an AI. Concretely: vary how bullets open (never three in a row starting with the same verb, not everything "Led/Drove/Spearheaded"); mix short punchy sentences with longer ones; concrete numbers beat adjectives; no buzzword soup ("results-driven", "synergy", "leverage", "passionate", "proven track record", "dynamic"). Read each bullet as if aloud — if it sounds like a template or a LinkedIn cliché, rewrite it. It should read like the candidate on their best day.
 4. Keep it tight: fits 1-2 pages. Cut ruthlessly — 2-4 bullets per role, older roles get fewer.
 5. Keep the candidate's real contact details exactly as provided; never invent contact info.
 
 ATS OPTIMIZATION (applicant tracking systems parse before humans read):
-6. Mirror the job description's exact terminology for skills and requirements the candidate genuinely has — parsers match the employer's own words, not synonyms.
-7. Include both the acronym and the spelled-out form of key terms on first use, e.g. "Sales & Operations Planning (S&OP)".
-8. Put the most important keywords in the summary and in the FIRST bullet of each role — parsers and recruiters weight the top of each section.
-9. Consistent date format throughout ("2019 – 2022"); reverse-chronological order; complete sentences in bullets, not fragments.
-10. Match the candidate's title phrasing to the target role's title where truthful (e.g. their real "Senior Product Manager" scope).
+6. Use the job description's exact terminology for skills and requirements the candidate genuinely has — parsers match the employer's own words, not synonyms. Include both the acronym and the spelled-out form on first use, e.g. "Sales & Operations Planning (S&OP)".
+7. Keywords must be WOVEN IN, never stuffed: a keyword only earns its place inside a real, specific achievement or skill. Never bolt on a sentence just to fit a term in, never repeat any keyword more than twice, and never let the summary become a keyword list — it must read as 3-4 sentences making one clear argument for the fit. If a bullet reads like a checklist of the posting's phrases, it is wrong: recruiters see stuffing instantly and ATS scoring does not reward density.
+8. Match the posting's TERMS, not its sentences. Copying phrases wholesale from the job description is both detectable and generic — everything must be rephrased in the candidate's own voice around their actual work.
+9. Put the most important keywords in the summary and in the FIRST bullet of each role — parsers and recruiters weight the top of each section. Consistent date format throughout ("2019 – 2022"); reverse-chronological; complete sentences in bullets.
+10. If the candidate lacks a required skill, leave it out entirely — a stuffed CV fails the interview it wins.
+
+FINAL PASS before you output: reread the whole CV once as a skeptical human recruiter. Fix any bullet that (a) sounds machine-written, (b) parrots the posting, or (c) exists only to house a keyword.
 
 Output ONLY a JSON object in exactly this shape — no preamble, no commentary, no code fences:
 ${CV_JSON_SCHEMA}
@@ -83,4 +85,4 @@ export const CHAT_SYSTEM_PREFIX = `You are the candidate's personal job-search c
 
 Style: direct, warm, practical. Sound human — vary your phrasing, skip corporate filler. When drafting text on the candidate's behalf, never invent facts about them; only use what their profile actually says.
 
-When they ask you to revise the CV, output the FULL revised CV as a JSON object inside a \`\`\`cv code fence so the app can save it as a new version — same schema as the current CV JSON you were given, all sections present. Otherwise answer normally.`;
+When they ask you to revise the CV, output the FULL revised CV as a JSON object inside a \`\`\`cv code fence so the app can save it as a new version — same schema as the current CV JSON you were given, all sections present. Revisions obey the same hard rules as generation: nothing invented, keywords woven into real achievements (never stuffed or copied verbatim from the posting), and a natural human voice. Otherwise answer normally.`;
