@@ -104,6 +104,18 @@ function findMarker(haystack, markers) {
   return markers.find((m) => haystack.includes(m)) ?? null;
 }
 
+// Country names that, if the ONLY location signal on an otherwise-remote
+// posting, get a clearer "verify" label than the generic one — e.g.
+// "Remote, Germany" becomes "Remote — Germany" rather than "region
+// unclear". This is display-only; it never grants the neighbor tier
+// (see classifyLocation step 3/4) because a country-scoped remote role
+// commonly requires actual residency there for payroll/tax, not just
+// proximity, so it's still just as unverified as any other bare remote.
+const NAMED_COUNTRIES_FOR_LABEL = [
+  "luxembourg", "belgium", "france", "germany", "netherlands", "spain", "italy",
+  "austria", "poland", "portugal", "ireland", "switzerland", "sweden", "denmark", "finland",
+];
+
 // The restriction regexes' capture groups are deliberately loose (so they
 // catch "India", "the United States", "South Africa" alike); this trims a
 // raw capture down to just the place name for display, e.g. "india for
@@ -125,13 +137,18 @@ function trimPlace(raw) {
 
 /**
  * Classify a lead's geographic fit for a candidate based in `prefs.home`
- * who can also commute from `prefs.commutable` countries. Returns a tier
- * used both for hard filtering (scoreLead) and for a human-readable chip
- * in the UI, so the reasoning is visible, not just the exclusion.
+ * who can also reach `prefs.commutable_areas` — actual towns within daily
+ * commuting range, NOT whole countries. Luxembourg's real commuter belt is
+ * a handful of border towns (Thionville, Trier, Arlon…); an on-site role in
+ * Paris, Munich or Cologne is in the "right" country but hundreds of
+ * kilometres away and not commutable "for everyday" — treating the whole
+ * country as commutable was the bug. Returns a tier used both for hard
+ * filtering (scoreLead) and for a human-readable chip in the UI, so the
+ * reasoning is visible, not just the exclusion.
  */
 export function classifyLocation(lead, prefs = {}) {
   const home = (prefs.home ?? "").toLowerCase();
-  const commutable = (prefs.commutable ?? []).map((c) => c.toLowerCase());
+  const commutableAreas = (prefs.commutable_areas ?? []).map((c) => c.toLowerCase());
   const field = (lead.location ?? "").toLowerCase();
   const snippet = (lead.snippet ?? "").toLowerCase();
 
@@ -150,21 +167,22 @@ export function classifyLocation(lead, prefs = {}) {
     const place = m[1].trim().toLowerCase();
     const ok =
       (home && place.includes(home)) ||
-      commutable.some((c) => place.includes(c)) ||
+      commutableAreas.some((c) => place.includes(c)) ||
       EU_WIDE_MARKERS.some((e) => place.includes(e));
     if (!ok) {
       return { tier: "restricted", fit: 0, label: `${NEIGHBOR_LABEL(trimPlace(m[1]))} only` };
     }
   }
 
-  // 3. Home / commutable — field is authoritative; snippet is a fallback
-  //    only for these specific, low-false-positive proper nouns (an
-  //    on-site role whose ATS field is blank but whose text names the
-  //    actual office, e.g. "based in our Luxembourg office").
+  // 3. Home / commutable town — field is authoritative; snippet is a
+  //    fallback only for these specific, low-false-positive proper nouns
+  //    (an on-site role whose ATS field is blank but whose text names the
+  //    actual town, e.g. "based in our Thionville office"). Whole-country
+  //    mentions are deliberately NOT matched here — see step 4/5.
   if (home && field.includes(home)) {
     return { tier: "home", fit: 1, label: NEIGHBOR_LABEL(prefs.home) };
   }
-  for (const c of commutable) {
+  for (const c of commutableAreas) {
     if (field.includes(c) || snippet.includes(c)) {
       return { tier: "neighbor", fit: 0.85, label: `${NEIGHBOR_LABEL(c)} (commutable)` };
     }
@@ -182,8 +200,16 @@ export function classifyLocation(lead, prefs = {}) {
   if (prefs.worldwide_remote_ok !== false && findMarker(field, WORLDWIDE_MARKERS)) {
     return { tier: "worldwide", fit: 0.7, label: "Remote — worldwide" };
   }
+  // 5. Bare "remote", possibly with a country name attached (e.g. "Remote,
+  //    Germany"). A country-scoped remote role usually still requires
+  //    actual residency in that country for payroll/tax — being 30 minutes
+  //    from the border doesn't satisfy that — so this stays "uncertain",
+  //    just with a clearer label naming what to verify.
   if (field.includes("remote")) {
-    return { tier: "uncertain", fit: 0.35, label: "Remote — region unclear, verify" };
+    const country = findMarker(field, NAMED_COUNTRIES_FOR_LABEL);
+    return country
+      ? { tier: "uncertain", fit: 0.35, label: `Remote — ${NEIGHBOR_LABEL(country)}, verify it covers Luxembourg` }
+      : { tier: "uncertain", fit: 0.35, label: "Remote — region unclear, verify" };
   }
   return { tier: "other", fit: 0, label: lead.location || "Location unclear" };
 }
