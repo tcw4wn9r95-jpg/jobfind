@@ -114,7 +114,7 @@ export default function ContactsPage() {
                   {c.notes && <p className="mt-2 text-xs leading-relaxed text-ink-600">{c.notes}</p>}
                   {c.job_title && (
                     <Link
-                      href={`/jobs/${c.job_id}`}
+                      href={`/job/?id=${c.job_id}`}
                       className="mt-2 inline-block text-xs font-semibold text-violet-600 hover:underline"
                     >
                       ↳ {c.job_title} at {c.job_company}

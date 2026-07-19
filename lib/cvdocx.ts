@@ -9,9 +9,10 @@ import {
 
 /**
  * Convert the Markdown CV Claude produces (headings, bullets, bold) into a
- * .docx file. Handles the subset of Markdown the CV prompt asks for.
+ * .docx Blob, in the browser. Handles the subset of Markdown the CV prompt
+ * asks for.
  */
-export async function markdownCvToDocx(markdown: string): Promise<Buffer> {
+export async function markdownCvToDocx(markdown: string): Promise<Blob> {
   const paragraphs: Paragraph[] = [];
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
 
@@ -74,7 +75,7 @@ export async function markdownCvToDocx(markdown: string): Promise<Buffer> {
     },
     sections: [{ children: paragraphs }],
   });
-  return Packer.toBuffer(doc);
+  return Packer.toBlob(doc);
 }
 
 /** Split "text **bold** *italic*" into styled runs. */
@@ -91,4 +92,24 @@ function inlineRuns(text: string): TextRun[] {
     }
   }
   return runs;
+}
+
+/** Trigger a browser download of a generated CV. */
+export async function downloadCv(
+  content: string,
+  company: string,
+  version: number,
+  format: "docx" | "md"
+) {
+  const base = `CV-${(company || "company").replace(/[^\w-]+/g, "_")}-v${version}`;
+  const blob =
+    format === "docx"
+      ? await markdownCvToDocx(content)
+      : new Blob([content], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${base}.${format}`;
+  a.click();
+  URL.revokeObjectURL(url);
 }

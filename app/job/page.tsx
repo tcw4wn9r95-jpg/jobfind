@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useRef, useState } from "react";
 import {
   Markdown,
   PageHeader,
@@ -13,10 +13,20 @@ import {
   api,
   useApi,
 } from "@/components/ui";
+import { downloadCv } from "@/lib/cvdocx";
 
 type Tab = "match" | "cv" | "chat" | "activity";
 
-export default function JobPage({ params }: { params: { id: string } }) {
+export default function JobPage() {
+  return (
+    <Suspense fallback={<Spinner label="Loading…" />}>
+      <JobPageInner />
+    </Suspense>
+  );
+}
+
+function JobPageInner() {
+  const params = { id: useSearchParams().get("id") ?? "" };
   const { data, loading, reload } = useApi<any>(`/api/jobs/${params.id}`);
   const [tab, setTab] = useState<Tab>("match");
   const router = useRouter();
@@ -220,7 +230,6 @@ function CvTab({
   reload: () => void;
 }) {
   const [busy, setBusy] = useState(false);
-  const [driveBusy, setDriveBusy] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState(0);
   const cv = cvs[selected];
@@ -229,27 +238,13 @@ function CvTab({
     setBusy(true);
     setError(null);
     try {
-      const res = await api(`/api/jobs/${jobId}/cv`, { method: "POST" });
-      if (res.driveError) setError(`Saved locally, but Drive upload failed: ${res.driveError}`);
+      await api(`/api/jobs/${jobId}/cv`, { method: "POST" });
       setSelected(0);
       reload();
     } catch (e: any) {
       setError(e.message);
     } finally {
       setBusy(false);
-    }
-  }
-
-  async function uploadToDrive(cvId: number) {
-    setDriveBusy(cvId);
-    setError(null);
-    try {
-      await api(`/api/jobs/${jobId}/cv/${cvId}/drive`, { method: "POST" });
-      reload();
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setDriveBusy(null);
     }
   }
 
@@ -296,42 +291,24 @@ function CvTab({
                 <span className="mt-0.5 block text-xs font-normal text-ink-400">
                   {c.created_at?.slice(0, 16)}
                 </span>
-                {c.drive_link && (
-                  <span className="mt-1 block text-xs font-semibold text-emerald-600">
-                    ● In Google Drive
-                  </span>
-                )}
               </button>
             ))}
           </div>
           {cv && (
             <div className="lg:col-span-3">
               <div className="mb-3 flex flex-wrap gap-2">
-                <a
+                <button
                   className="btn-secondary"
-                  href={`/api/jobs/${jobId}/cv/${cv.id}/download?format=docx`}
+                  onClick={() => downloadCv(cv.content, job.company, cv.version, "docx")}
                 >
                   ⬇ Download .docx
-                </a>
-                <a
+                </button>
+                <button
                   className="btn-secondary"
-                  href={`/api/jobs/${jobId}/cv/${cv.id}/download?format=md`}
+                  onClick={() => downloadCv(cv.content, job.company, cv.version, "md")}
                 >
                   ⬇ Markdown
-                </a>
-                {cv.drive_link ? (
-                  <a className="btn-secondary" href={cv.drive_link} target="_blank" rel="noreferrer">
-                    Open in Google Drive ↗
-                  </a>
-                ) : (
-                  <button
-                    className="btn-secondary"
-                    onClick={() => uploadToDrive(cv.id)}
-                    disabled={driveBusy === cv.id}
-                  >
-                    {driveBusy === cv.id ? <Spinner label="Uploading…" /> : "Save to Google Drive"}
-                  </button>
-                )}
+                </button>
               </div>
               <div className="card p-8">
                 <Markdown text={cv.content} />

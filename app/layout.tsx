@@ -2,19 +2,21 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { MobileNav, Nav } from "@/components/nav";
 
+const BP = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
 export const metadata: Metadata = {
   title: "JobFind — your job search, on offense",
   description:
     "Track roles, score matches with Claude, tailor your CV and land the job.",
-  manifest: "/manifest.webmanifest",
+  manifest: `${BP}/manifest.webmanifest`,
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "JobFind",
   },
   icons: {
-    icon: "/icon-192.png",
-    apple: "/apple-touch-icon.png",
+    icon: `${BP}/icon-192.png`,
+    apple: `${BP}/apple-touch-icon.png`,
   },
 };
 

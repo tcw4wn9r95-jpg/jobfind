@@ -75,7 +75,7 @@ export default function PipelinePage() {
                   {colJobs.map((j) => (
                     <Link
                       key={j.id}
-                      href={`/jobs/${j.id}`}
+                      href={`/job/?id=${j.id}`}
                       draggable
                       onDragStart={() => setDragId(j.id)}
                       onDragEnd={() => setDragId(null)}

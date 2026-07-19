@@ -1,24 +1,27 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { loadDb } from "./localdb";
 
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
-
-let client: Anthropic | null = null;
-
-export function getClaude(): Anthropic {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    throw new ApiKeyMissingError();
-  }
-  if (!client) client = new Anthropic();
-  return client;
-}
+// Claude is called straight from the browser with the user's own key
+// (stored on-device in Settings). No server sees it.
 
 export class ApiKeyMissingError extends Error {
   constructor() {
-    super(
-      "ANTHROPIC_API_KEY is not set. Add it to .env.local (see .env.example) and restart the app."
-    );
+    super("No API key yet — open Settings and paste your Anthropic API key first.");
     this.name = "ApiKeyMissingError";
   }
+}
+
+function getClient(): { client: Anthropic; model: string } {
+  const { apiKey, model } = loadDb().settings;
+  if (!apiKey) throw new ApiKeyMissingError();
+  return {
+    client: new Anthropic({
+      apiKey,
+      dangerouslyAllowBrowser: true,
+      defaultHeaders: { "anthropic-dangerous-direct-browser-access": "true" },
+    }),
+    model: model || "claude-sonnet-5",
+  };
 }
 
 export async function askClaude(opts: {
@@ -26,8 +29,9 @@ export async function askClaude(opts: {
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
 }): Promise<string> {
-  const res = await getClaude().messages.create({
-    model: MODEL,
+  const { client, model } = getClient();
+  const res = await client.messages.create({
+    model,
     max_tokens: opts.maxTokens ?? 4096,
     system: opts.system,
     messages: opts.messages,

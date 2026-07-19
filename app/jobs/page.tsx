@@ -102,7 +102,7 @@ export default function JobsPage() {
           {jobs.map((j) => (
             <li key={j.id}>
               <Link
-                href={`/jobs/${j.id}`}
+                href={`/job/?id=${j.id}`}
                 className="card flex items-center gap-5 p-5 transition hover:border-indigo-300 hover:shadow-lift"
               >
                 <ScoreRing score={j.score} size={64} />
