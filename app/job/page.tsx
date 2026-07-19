@@ -14,6 +14,7 @@ import {
   useApi,
 } from "@/components/ui";
 import { downloadCv } from "@/lib/cvdocx";
+import { CvPreview } from "@/components/cv-preview";
 
 type Tab = "match" | "cv" | "chat" | "activity";
 
@@ -255,7 +256,8 @@ function CvTab({
           <h3 className="font-bold text-ink-900">Tailored CV for {job.company || "this role"}</h3>
           <p className="mt-1 max-w-xl text-xs leading-relaxed text-ink-500">
             Rebuilt from your real experience only — nothing invented, reworded to sound like
-            you, emphasised for this role. Ask for tweaks in the Claude chat tab.
+            you, keyword-matched for ATS parsers, and laid out in your CV template. Ask for
+            tweaks in the Claude chat tab.
           </p>
         </div>
         <button className="btn-primary" onClick={generate} disabled={busy}>
@@ -311,7 +313,7 @@ function CvTab({
                 </button>
               </div>
               <div className="card p-8">
-                <Markdown text={cv.content} />
+                <CvPreview content={cv.content} />
               </div>
             </div>
           )}

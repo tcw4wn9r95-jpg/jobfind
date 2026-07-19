@@ -2,6 +2,7 @@
 // Same paths, same request/response shapes — components didn't have to change.
 
 import { askClaude, askClaudeJson } from "./ai";
+import { CvData, isCvData } from "./cvschema";
 import { fetchJobPage } from "./jobtext";
 import {
   Db,
@@ -173,7 +174,7 @@ async function analyseProfile(cv: string) {
 async function generateCv(jobId: number) {
   const db = loadDb();
   const job = jobOr404(db, jobId);
-  const content = await askClaude({
+  const cvData = await askClaudeJson<CvData>({
     system: CV_GENERATION_SYSTEM,
     maxTokens: 8000,
     messages: [
@@ -183,7 +184,10 @@ async function generateCv(jobId: number) {
       },
     ],
   });
-  const cleaned = content.replace(/^```(?:markdown|md)?\n?|```\s*$/g, "").trim();
+  if (!isCvData(cvData)) {
+    throw new ApiError("The generated CV came back malformed — try again.");
+  }
+  const cleaned = JSON.stringify(cvData, null, 2);
   return mutate((db) => {
     const maxV = Math.max(0, ...db.cvs.filter((c) => c.job_id === jobId).map((c) => c.version));
     const cv = { id: nextId(db), job_id: jobId, version: maxV + 1, content: cleaned, created_at: now() };
@@ -234,9 +238,20 @@ ${latestCv ? `CURRENT TAILORED CV (v${latestCv.version}):\n${latestCv.content}` 
     let newCv = null;
     const cvMatch = reply.match(/```cv\n([\s\S]*?)```/);
     if (cvMatch && cvMatch[1].trim().length > 100) {
-      const maxV = Math.max(0, ...db.cvs.filter((c) => c.job_id === jobId).map((c) => c.version));
-      newCv = { id: nextId(db), job_id: jobId, version: maxV + 1, content: cvMatch[1].trim(), created_at: now() };
-      db.cvs.push(newCv);
+      // Revisions must be valid template JSON; anything else is ignored
+      // rather than saved as a broken version.
+      let content: string | null = null;
+      try {
+        const parsed = JSON.parse(cvMatch[1].trim());
+        if (isCvData(parsed)) content = JSON.stringify(parsed, null, 2);
+      } catch {
+        content = null;
+      }
+      if (content) {
+        const maxV = Math.max(0, ...db.cvs.filter((c) => c.job_id === jobId).map((c) => c.version));
+        newCv = { id: nextId(db), job_id: jobId, version: maxV + 1, content, created_at: now() };
+        db.cvs.push(newCv);
+      }
     }
     return { reply, newCv };
   });
