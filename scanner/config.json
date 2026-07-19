@@ -29,9 +29,13 @@
     "AI"
   ],
   "location_preferences": {
-    "_comment": "home = on-site match; commutable = neighboring countries people actually commute into Luxembourg from; eu_wide_remote_ok/worldwide_remote_ok control whether those broader remote tiers count as a fit.",
+    "_comment": "home = on-site match. commutable_areas = actual towns within daily commuting range of Luxembourg City, NOT whole countries — Paris/Munich/Cologne are technically in neighboring countries but hundreds of km away and not commutable. Add/remove towns to match your real range. eu_wide_remote_ok/worldwide_remote_ok control whether those broader remote tiers count as a fit.",
     "home": "Luxembourg",
-    "commutable": ["Belgium", "France", "Germany"],
+    "commutable_areas": [
+      "arlon", "martelange", "attert", "habay", "athus", "virton", "florenville",
+      "thionville", "metz", "longwy", "villerupt", "audun-le-tiche", "hettange", "briey",
+      "trier", "saarbrücken", "saarbruecken", "konz", "saarburg", "perl", "merzig"
+    ],
     "eu_wide_remote_ok": true,
     "worldwide_remote_ok": true
   },
