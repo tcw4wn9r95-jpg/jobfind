@@ -40,7 +40,11 @@
     "worldwide_remote_ok": true
   },
   "strict_location": true,
-  "exclude_title_words": ["intern", "internship", "junior", "working student", "phd", "apprentice"],
+  "exclude_title_words": [
+    "intern", "internship", "junior", "working student", "phd", "apprentice",
+    "werkstudent", "praktikum", "praktikant", "auszubildende", "ausbildung",
+    "stagiaire", "becario", "becaria"
+  ],
   "min_score": 35,
   "max_leads": 20,
   "max_age_days": 30

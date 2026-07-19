@@ -174,18 +174,20 @@ export function classifyLocation(lead, prefs = {}) {
     }
   }
 
-  // 3. Home / commutable town — field is authoritative; snippet is a
-  //    fallback only for these specific, low-false-positive proper nouns
-  //    (an on-site role whose ATS field is blank but whose text names the
-  //    actual town, e.g. "based in our Thionville office"). Whole-country
-  //    mentions are deliberately NOT matched here — see step 4/5.
+  // 3. Home / commutable town — field ONLY, same reasoning as step 4 below.
+  //    A snippet fallback here caused real false positives: a Stripe role
+  //    actually based in "NYC-Privy" was tagged "Perl (commutable)" because
+  //    its description mentioned the Perl programming language, and a
+  //    Berlin role was tagged "Konz (commutable)" because its German text
+  //    said "Konzepte" (concepts) — "konz" is just a common word stem, not
+  //    a low-false-positive proper noun as assumed. Whole-country mentions
+  //    are deliberately NOT matched here either — see step 4/5.
   if (home && field.includes(home)) {
     return { tier: "home", fit: 1, label: NEIGHBOR_LABEL(prefs.home) };
   }
-  for (const c of commutableAreas) {
-    if (field.includes(c) || snippet.includes(c)) {
-      return { tier: "neighbor", fit: 0.85, label: `${NEIGHBOR_LABEL(c)} (commutable)` };
-    }
+  const town = findMarker(field, commutableAreas);
+  if (town) {
+    return { tier: "neighbor", fit: 0.85, label: `${NEIGHBOR_LABEL(town)} (commutable)` };
   }
 
   // 4. EU-wide / worldwide remote — trust ONLY the structured location
