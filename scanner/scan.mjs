@@ -172,6 +172,90 @@ const fetchers = {
     }
     return leads;
   },
+
+  // Optional: needs a free key from developer.adzuna.com, set as the
+  // ADZUNA_APP_ID / ADZUNA_APP_KEY repo secrets. Covers on-site (not just
+  // remote) jobs in France and Germany — Luxembourg itself isn't one of
+  // Adzuna's 12 supported countries, but its two biggest commuter-source
+  // neighbors are, which is what closes the "not only remote jobs" gap.
+  async adzuna() {
+    const id = process.env.ADZUNA_APP_ID;
+    const key = process.env.ADZUNA_APP_KEY;
+    if (!id || !key) {
+      console.log("adzuna: skipped (ADZUNA_APP_ID/ADZUNA_APP_KEY not set)");
+      return [];
+    }
+    const leads = [];
+    // Capped to a handful of the most senior/representative titles per
+    // country to stay well inside the free tier's daily call allowance —
+    // local scoring still ranks the results, so precision here matters
+    // less than breadth.
+    const titles = (config.target_titles ?? []).slice(0, 4);
+    for (const country of ["fr", "de"]) {
+      for (const title of titles) {
+        try {
+          const data = await getJson(
+            `https://api.adzuna.com/v1/api/jobs/${country}/search/1?` +
+              new URLSearchParams({
+                app_id: id,
+                app_key: key,
+                results_per_page: "20",
+                what: title,
+                content_type: "application/json",
+              })
+          );
+          for (const j of data.results ?? []) {
+            leads.push(
+              makeLead({
+                title: j.title,
+                company: j.company?.display_name,
+                location: j.location?.display_name ?? "",
+                url: j.redirect_url,
+                postedAt: j.created,
+                description: j.description,
+                source: `adzuna:${country}`,
+              })
+            );
+          }
+        } catch (e) {
+          console.warn(`adzuna ${country}/${title}: ${e.message}`);
+        }
+      }
+    }
+    return leads;
+  },
+
+  // Optional: needs a free key from jooble.org/api/about, set as the
+  // JOOBLE_API_KEY repo secret. Aggregates from thousands of sources
+  // across 69+ countries; searched directly against Luxembourg with a
+  // radius wide enough to catch the real commuter belt.
+  async jooble() {
+    const key = process.env.JOOBLE_API_KEY;
+    if (!key) {
+      console.log("jooble: skipped (JOOBLE_API_KEY not set)");
+      return [];
+    }
+    const keywords = (config.target_titles ?? []).slice(0, 5).join(", ");
+    const res = await fetch(`https://jooble.org/api/${key}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keywords, location: "Luxembourg", radius: "40" }),
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return (data.jobs ?? []).map((j) =>
+      makeLead({
+        title: j.title,
+        company: j.company,
+        location: j.location ?? "",
+        url: j.link,
+        postedAt: j.updated,
+        description: j.snippet,
+        source: "jooble",
+      })
+    );
+  },
 };
 
 async function main() {
