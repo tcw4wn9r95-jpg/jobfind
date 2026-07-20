@@ -20,8 +20,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      # GITHUB_REPOSITORY-based vars exist on schedule events too (event payload doesn't)
+      # GITHUB_REPOSITORY-based vars exist on schedule events too (event payload doesn't).
+      # ADZUNA_*/JOOBLE_API_KEY are optional — those two fetchers skip
+      # themselves cleanly if the corresponding secret isn't set.
       - run: SITE_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}" node scanner/scan.mjs
+        env:
+          ADZUNA_APP_ID: ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY: ${{ secrets.ADZUNA_APP_KEY }}
+          JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
       - name: Publish leads to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:

@@ -46,15 +46,32 @@ JobFind app ("Leads" inbox on the Jobs page)
   the Action polls each board directly. This is where the best leads come from:
   jobs appear here before aggregators pick them up.
 
-**Tier 3 — free-key aggregators** *(adds breadth)*
-- Adzuna — free developer key, broad EU coverage incl. FR/DE; good for
-  Luxembourg-adjacent searches
-- Jooble — free API key on request
+**Tier 3 — free-key aggregators** *(shipped; adds on-site, not just remote)*
+- [Adzuna](https://developer.adzuna.com/) — free key (`ADZUNA_APP_ID`/
+  `ADZUNA_APP_KEY` repo secrets). Covers on-site jobs in France and Germany —
+  Luxembourg itself isn't one of Adzuna's 12 supported countries, but its two
+  biggest commuter-source neighbors are, which is exactly the gap Tier 1/2
+  (mostly remote-first) didn't close.
+- [Jooble](https://jooble.org/api/about) — free key (`JOOBLE_API_KEY` repo
+  secret). Aggregates from thousands of sources across 69+ countries; searched
+  directly against `location: "Luxembourg"` with a 40km radius.
+- Both are optional and skip themselves cleanly (one log line, empty result)
+  if their secret isn't set — the scanner runs fine without them, just with
+  less on-site breadth.
 - Hacker News "Who is hiring?" via the free Algolia HN API (monthly thread)
+  — not yet built.
 
-**Explicitly out:** LinkedIn and Indeed (no public API; scraping violates
-their terms and breaks constantly). If a LinkedIn posting matters, paste its
-link into the app as today.
+**Investigated and explicitly excluded:**
+- **LinkedIn, Indeed** — no public API; scraping violates their terms and
+  breaks constantly. Paste the link/description into the app instead.
+- **EURES** (the EU's official job mobility portal, ~2M postings) — no public
+  API, and its terms of use *explicitly prohibit* scraping. Third-party paid
+  scrapers exist but that's the same ToS problem, just outsourced.
+- **ADEM** (Luxembourg's national employment agency) — publishes open data,
+  but only historical statistics, not a live current-vacancies feed. Nothing
+  usable despite being the most obvious candidate.
+- **Moovijob** (Luxembourg's largest local job board) — no confirmed public
+  API or feed; would mean scraping HTML with no ToS certainty.
 
 ## Local scoring (keeps it free)
 
@@ -78,8 +95,8 @@ tap a lead.
 | Item | Cost |
 |---|---|
 | GitHub Actions (1 run/day, ~2 min) | $0 (public repo) |
-| Tier 1 + 2 + HN sources | $0, no keys |
-| Adzuna / Jooble | $0 (free keys, well under rate limits) |
+| Tier 1 + 2 sources | $0, no keys |
+| Adzuna / Jooble | $0 (free keys; unset = skipped, no cost either way) |
 | Leads hosting (`leads.json` on gh-pages) | $0 |
 | On-tap Claude analysis | your existing API usage (~$0.01–0.05/lead you choose to analyse) |
 | *Optional:* Haiku pre-ranking of the daily top-20 inside the Action | ~$0.10–0.30/mo (needs an API key as a repo secret — off by default) |
