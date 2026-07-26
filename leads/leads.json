@@ -1,44 +1,57 @@
 {
-  "generated_at": "2026-07-25T08:26:45.834Z",
+  "generated_at": "2026-07-26T08:41:37.283Z",
   "leads": [
     {
-      "id": "18sgis",
-      "title": "Staff Product Engineer",
-      "company": "LawnStarter",
-      "location": "Anywhere",
-      "url": "https://jobicy.com/jobs/147510-staff-product-engineer",
-      "posted_at": "2026-07-24",
-      "snippet": "About LawnStarterLawnStarter is the nation's leading on-demand marketplace for lawn care and outdoor services, with over $100M in annual bookings. We're expanding beyond lawn care to become the one-stop shop for all home services — operating across three brands (LawnStarter, Lawn Love, Home Gnome) on a single shared platform.About Engineering at LawnStarterWe build in small,&hellip;",
+      "id": "ma0t3c",
+      "title": "Technical Product Manager",
+      "company": "Autodesk",
+      "location": "EMEA,  Netherlands",
+      "url": "https://jobicy.com/jobs/146501-technical-product-manager",
+      "posted_at": "2026-07-25",
+      "snippet": "Job Requisition ID #26WD98566Autodesk is the global leader in design and make technology, including industry-leading 3D design, engineering, and entertainment software and services, that offer customers better outcomes through automation and insights for their design and make processes. If you’ve ever driven a high-performance car, admired a towering skyscraper, used a smartphone, or watched a&hellip;",
       "source": "jobicy",
-      "score": 52,
-      "location_tier": "worldwide",
-      "location_note": "Remote — worldwide"
+      "score": 76,
+      "location_tier": "eu",
+      "location_note": "Remote — EU-wide"
     },
     {
-      "id": "tg9ziq",
-      "title": "Startup Coach & Innovation Manager (m/w/d) im Impact Accelerator",
-      "company": "Founders Bay",
-      "location": "Lietzow · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/founders-bay/startup-coach-innovation-manager-im-impact-accelerator-lietzow-184990",
+      "id": "1vlgn5t",
+      "title": "Brand Content & Communications Associate Manager",
+      "company": "FuseGlobal",
+      "location": "Remote,",
+      "url": "https://remoteOK.com/remote-jobs/remote-brand-content-communications-associate-manager-fuseglobal-1135387",
       "posted_at": "2026-07-24",
-      "snippet": "Der Founders Bay Impact Accelerator ist ein intensives, sechsmonatiges Vollzeitprogramm für Startup-Teams, das zweimal im Jahr stattfindet. Als Pioniere in der Förderung von Startups auch abseits der großen Metropolen und ländlichen Regionen steigen wir in den frühen Phasen ein - ideal für Teams, die bereits mehr als ein Konzept oder einen Prototypen haben. Unser einzigartiger Ansatz verbindet die Vorteile des ländlichen Raums mit Impact-Know-how und erstklassiger Startup-Förderung: individuelle Unterstützung, gezielte Workshops, Impact-Learnings und wöchentliche Meetings sowie kollaboratives ",
-      "source": "arbeitnow",
-      "score": 40,
-      "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
-    },
-    {
-      "id": "agf57k",
-      "title": "Business Development Manager",
-      "company": "Temu",
-      "location": "Remote",
-      "url": "https://remoteOK.com/remote-jobs/remote-business-development-manager-temu-1135291",
-      "posted_at": "2026-07-23",
-      "snippet": "Role Description: This is a full-time remote role for Business Development ManagerResponsibility:1.â¦ Please mention the word **THRILL** and tag RNjQuMjM2LjE0MC4xNzk= when applying to show you read the job post completely (#RNjQuMjM2LjE0MC4xNzk=). This is a beta feature to avoid spam applicants. Companies can search these words to find applicants that read this and see they're human.",
+      "snippet": "Posted 5:02:57 PM. Title: Brand Content & Communications Associate Manager (remote)Location: Remote (candidates mustâ¦See this and similar jobs on LinkedIn. Please mention the word **BRILLIANCE** and tag RMTM1LjExOS43Ny4xNDc= when applying to show you read the job post completely (#RMTM1LjExOS43Ny4xNDc=). This is a beta feature to avoid spam applicants. Companies can search these words to find applicants that read this and see they're human.",
       "source": "remoteok",
       "score": 40,
       "location_tier": "uncertain",
       "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "1fyki3d",
+      "title": "Lifecycle Specialist: Time & Attendance",
+      "company": "Remote",
+      "location": "EMEA",
+      "url": "https://jobicy.com/jobs/147423-lifecycle-specialist-time-attendance",
+      "posted_at": "2026-07-25",
+      "snippet": "About Remote Remote is solving modern organizations’ biggest challenge – navigating global employment compliantly with ease. We make it possible for businesses of all sizes to recruit, pay, and manage international teams. With our core values at heart and future focused work culture, our team works tirelessly on ambitious problems, asynchronously, around the world. You&hellip;",
+      "source": "jobicy",
+      "score": 36,
+      "location_tier": "eu",
+      "location_note": "Remote — EU-wide"
+    },
+    {
+      "id": "ddhjbf",
+      "title": "Customer Support Associate (Self-Service)",
+      "company": "Osano",
+      "location": "Anywhere",
+      "url": "https://jobicy.com/jobs/149751-customer-support-associate-self-service",
+      "posted_at": "2026-07-26",
+      "snippet": "About Osano:Osano is an innovative B-Corporation built around a simple belief: privacy is a fundamental right. Since day one, we’ve been focused on giving modern enterprises the ability to innovate quickly, stay competitive, and earn customer trust by respecting data privacy and complying with consent guidelines. Our products help organizations operate confidently in a rapidly&hellip;",
+      "source": "jobicy",
+      "score": 35,
+      "location_tier": "worldwide",
+      "location_note": "Remote — worldwide"
     }
   ]
 }
