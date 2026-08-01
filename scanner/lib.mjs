@@ -250,9 +250,14 @@ function tokens(s) {
 // "Program Manager" at 50% word-overlap purely via the shared "Manager"
 // before this existed. A title now needs to share at least one word that
 // ISN'T in this list with a target before it counts as any fit at all.
+// Also includes plain function words ("of", "and", "for"…) for the exact
+// same reason — "Head of Supply Chain" vs "Head of CRM / Retention Lead"
+// matched at 50% purely on the shared "head"+"of", neither of which says
+// anything about the actual role.
 const GENERIC_TITLE_WORDS = new Set([
   "manager", "senior", "head", "lead", "director", "specialist", "officer",
   "associate", "coordinator", "chief", "vp",
+  "of", "and", "or", "the", "a", "an", "for", "in", "on", "with", "to", "at", "by",
 ]);
 
 /**
