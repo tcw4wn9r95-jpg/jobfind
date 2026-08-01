@@ -21,6 +21,13 @@ concurrency:
 jobs:
   scan:
     runs-on: ubuntu-latest
+    # Worst-case bound (every source timing out sequentially) is ~8 minutes;
+    # a run stuck past that is hung, not slow. Without this it could run for
+    # GitHub's default 6h job cap, tying up the shared "pages" concurrency
+    # group and blocking app deploys behind it the whole time — confirmed
+    # happened: a run sat in_progress for 12+ minutes with no sign of
+    # finishing until cancelled by hand.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
