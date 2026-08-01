@@ -78,12 +78,24 @@ JobFind app ("Leads" inbox on the Jobs page)
 The Action ranks without any AI call:
 
 ```
-score = 40 · title_similarity(target_titles)
-      + 30 · keyword_hits(must_have ∪ nice_to_have)  # capped
-      + 20 · location_fit(Luxembourg | remote-EU | listed cities)
+RELEVANCE GATE (hard): title_fit ≥ min_title_fit  OR  keyword_hits ≥ min_keyword_hits
+                        else excluded outright — location/recency never override this
+
+score = 35 · title_similarity(target_titles, generic words like "Manager" don't count alone)
+      + 20 · keyword_hits(keywords)  # capped
+      + 35 · location_fit(Luxembourg | commutable border town | remote-EU | worldwide)
       + 10 · recency(≤7 days)
-      − hard_filters (wrong seniority, excluded companies, non-EU on-site)
+      − hard_filters (wrong seniority, stale, non-EU/non-Luxembourg restriction)
 ```
+
+The relevance gate exists because location + recency alone can total 45
+points — more than min_score — so without it, any fully-remote EU-wide
+company's entire job board passes regardless of the actual role. This
+happened in production: Canonical and HelloFresh (both 100%-remote, EU-wide)
+flooded the inbox with "Accounts Receivable Clerk" and "Graduate Talent
+Scientist" purely on proximity and freshness. The gate — and treating a
+matched "Manager"/"Senior" alone as zero evidence of fit, since virtually
+every target title contains one — closed this.
 
 Config lives in `scanner/config.json` (titles, keywords, locations,
 exclusions — generic by design). The expensive, personal, profile-aware

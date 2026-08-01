@@ -8,6 +8,8 @@
     "Supply Chain Manager",
     "Head of Supply Chain",
     "Sustainability Manager",
+    "Circular Economy Manager",
+    "ESG Manager",
     "Senior Operations Manager",
     "Product Operations"
   ],
@@ -26,6 +28,11 @@
     "process improvement",
     "lean",
     "six sigma",
+    "resale",
+    "reverse logistics",
+    "ESG",
+    "stakeholder management",
+    "e-commerce",
     "AI"
   ],
   "location_preferences": {
@@ -40,6 +47,9 @@
     "worldwide_remote_ok": true
   },
   "strict_location": true,
+  "_relevance_comment": "min_title_fit/min_keyword_hits are a hard gate: a lead needs real title-word overlap OR this many keyword hits before location/recency count for anything. Without this, a fully-remote EU-wide company's entire job board (any title at all) could pass on proximity and freshness alone — that's how 'Accounts Receivable Clerk' and 'Graduate Talent Scientist' ended up in the inbox.",
+  "min_title_fit": 0.5,
+  "min_keyword_hits": 2,
   "exclude_title_words": [
     "intern", "internship", "junior", "working student", "phd", "apprentice",
     "werkstudent", "praktikum", "praktikant", "auszubildende", "ausbildung",
