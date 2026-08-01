@@ -243,12 +243,33 @@ function tokens(s) {
   );
 }
 
+// Every target title contains a word from this set ("Manager", "Senior",
+// "Head", "Lead"…) — matching ONLY on one of these isn't evidence of
+// relevance, since it's true of nearly any management-track job title.
+// "Python Engineering Manager" and "CRM Marketing Manager" both matched
+// "Program Manager" at 50% word-overlap purely via the shared "Manager"
+// before this existed. A title now needs to share at least one word that
+// ISN'T in this list with a target before it counts as any fit at all.
+const GENERIC_TITLE_WORDS = new Set([
+  "manager", "senior", "head", "lead", "director", "specialist", "officer",
+  "associate", "coordinator", "chief", "vp",
+]);
+
 /**
  * Heuristic 0–100 score: 35 title fit, 20 keyword hits, 35 location fit,
  * 10 recency. Hard exclusions (wrong seniority, stale, explicit
  * non-EU/non-Luxembourg restriction, or — unless strict_location is
  * disabled — an unmatched location with no remote/EU signal at all)
  * return -1.
+ *
+ * RELEVANCE GATE: location + recency alone can total up to 45 points —
+ * more than min_score — so before location weighting was raised to fix
+ * the geography problem, a fully-remote EU-wide company's entire job
+ * board (Canonical, HelloFresh, …) could pass regardless of the actual
+ * role. "Accounts Receivable Clerk" and "Graduate Talent Scientist" both
+ * scored above threshold this way. A candidate must now clear a minimum
+ * title-word-overlap OR keyword-hit bar before location/recency count
+ * for anything — no job passes on proximity and freshness alone.
  */
 export function scoreLead(lead, config) {
   const title = lead.title.toLowerCase();
@@ -261,18 +282,21 @@ export function scoreLead(lead, config) {
     if (age > config.max_age_days) return -1;
   }
 
-  const loc = classifyLocation(lead, config.location_preferences ?? {});
-  if (loc.tier === "restricted") return -1;
-  if (config.strict_location !== false && loc.tier === "other") return -1;
-
-  // Title: best word-overlap with any target title
+  // Title: best word-overlap with any target title, but only counts if at
+  // least one matched word is distinctive (see GENERIC_TITLE_WORDS above).
   const titleTokens = tokens(title);
   let titleFit = 0;
   for (const target of config.target_titles ?? []) {
     const t = tokens(target.toLowerCase());
     let hit = 0;
-    for (const w of t) if (titleTokens.has(w)) hit++;
-    titleFit = Math.max(titleFit, hit / t.size);
+    let distinctiveHit = false;
+    for (const w of t) {
+      if (titleTokens.has(w)) {
+        hit++;
+        if (!GENERIC_TITLE_WORDS.has(w)) distinctiveHit = true;
+      }
+    }
+    if (distinctiveHit) titleFit = Math.max(titleFit, hit / t.size);
   }
 
   // Keywords in title + snippet (capped so stuffing long posts doesn't win)
@@ -282,6 +306,14 @@ export function scoreLead(lead, config) {
     if (haystack.includes(k.toLowerCase())) kw++;
   }
   const kwFit = Math.min(kw / 4, 1);
+
+  const minTitleFit = config.min_title_fit ?? 0.5;
+  const minKeywordHits = config.min_keyword_hits ?? 2;
+  if (titleFit < minTitleFit && kw < minKeywordHits) return -1;
+
+  const loc = classifyLocation(lead, config.location_preferences ?? {});
+  if (loc.tier === "restricted") return -1;
+  if (config.strict_location !== false && loc.tier === "other") return -1;
 
   let recency = 0.5;
   if (lead.posted_at) {
