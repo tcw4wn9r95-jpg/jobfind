@@ -10,7 +10,19 @@ import {
   TabStopType,
   TextRun,
 } from "docx";
+import { applyContact, normalizeContact } from "./contact";
 import { CvData, cvToText, linkedinUrl, parseCv } from "./cvschema";
+import { loadDb } from "./localdb";
+
+/**
+ * Contact details are always taken from the current profile at render time,
+ * not from whatever was frozen into the stored CV. That repairs CVs generated
+ * before contact details were deterministic, and means updating your phone
+ * number updates every CV rather than only future ones.
+ */
+function withProfileContact(cv: CvData): CvData {
+  return applyContact(cv, normalizeContact(loadDb().profile?.contact));
+}
 
 // Faithful reproduction of the reference template (CV_Diego_Casares_2026.docx):
 // A4, 1.5cm margins, Calibri, navy #1f3a5f accents, small-caps section headings
@@ -258,7 +270,8 @@ export async function downloadCv(
   format: "docx" | "md"
 ) {
   const base = `CV-${(company || "company").replace(/[^\w-]+/g, "_")}-v${version}`;
-  const cv = parseCv(content);
+  const parsed = parseCv(content);
+  const cv = parsed ? withProfileContact(parsed) : null;
   let blob: Blob;
   if (format === "docx") {
     const doc = cv ? buildTemplateDocx(cv) : legacyMarkdownDocx(content);

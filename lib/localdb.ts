@@ -2,10 +2,14 @@
 // Shapes mirror the SQL rows the original server version used, so the UI
 // components consume identical objects.
 
+import { ContactDetails, EMPTY_CONTACT, normalizeContact } from "./contact";
+
 export type Profile = {
   raw_cv: string;
   summary: string;
   structured: string; // JSON string
+  /** Source of truth for the CV contact line — never LLM-generated. */
+  contact: ContactDetails;
   updated_at: string;
 };
 
@@ -95,7 +99,13 @@ const KEY = "jobfind-db";
 
 function emptyDb(): Db {
   return {
-    profile: { raw_cv: "", summary: "", structured: "{}", updated_at: now() },
+    profile: {
+      raw_cv: "",
+      summary: "",
+      structured: "{}",
+      contact: { ...EMPTY_CONTACT },
+      updated_at: now(),
+    },
     questions: [],
     jobs: [],
     cvs: [],
@@ -118,7 +128,12 @@ export function loadDb(): Db {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return emptyDb();
-    return { ...emptyDb(), ...JSON.parse(raw) };
+    const db = { ...emptyDb(), ...JSON.parse(raw) };
+    // The spread above replaces the whole profile object, so a database saved
+    // before `contact` existed would carry an undefined one. Normalize it.
+    db.profile = { ...emptyDb().profile, ...db.profile };
+    db.profile.contact = normalizeContact(db.profile.contact);
+    return db;
   } catch {
     return emptyDb();
   }
