@@ -1,21 +1,34 @@
 "use client";
 
 import { Markdown } from "@/components/ui";
-import { parseCv } from "@/lib/cvschema";
+import { linkedinUrl, parseCv } from "@/lib/cvschema";
 
 /** On-screen approximation of the CV template (navy accents, small-caps
  *  section rules). Falls back to Markdown for legacy versions. */
 export function CvPreview({ content }: { content: string }) {
   const cv = parseCv(content);
   if (!cv) return <Markdown text={content} />;
+  const linkedin = linkedinUrl(cv.linkedin);
 
   return (
     <div className="font-[Calibri,sans-serif] text-[13px] leading-snug text-black">
       <p className="text-center text-xl font-bold text-[#1f3a5f]">{cv.name}</p>
       <p className="mb-3 text-center text-[11px]">
-        Email: <span className="text-[#1f3a5f] underline">{cv.email}</span>
+        Email: {cv.email}
         {"  |  "}Tel: {cv.phone}
-        {"  |  "}LinkedIn: <span className="text-[#1f3a5f] underline">{cv.linkedin}</span>
+        {linkedin && (
+          <>
+            {"  |  "}
+            <a
+              href={linkedin}
+              target="_blank"
+              rel="noreferrer"
+              className="text-[#1f3a5f] underline"
+            >
+              LinkedIn
+            </a>
+          </>
+        )}
       </p>
       <p className="mb-3 text-justify">{plain(cv.summary)}</p>
 

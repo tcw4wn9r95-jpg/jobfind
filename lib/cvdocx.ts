@@ -2,6 +2,7 @@ import {
   AlignmentType,
   BorderStyle,
   Document,
+  ExternalHyperlink,
   LevelFormat,
   Packer,
   Paragraph,
@@ -9,7 +10,7 @@ import {
   TabStopType,
   TextRun,
 } from "docx";
-import { CvData, cvToText, parseCv } from "./cvschema";
+import { CvData, cvToText, linkedinUrl, parseCv } from "./cvschema";
 
 // Faithful reproduction of the reference template (CV_Diego_Casares_2026.docx):
 // A4, 1.5cm margins, Calibri, navy #1f3a5f accents, small-caps section headings
@@ -66,8 +67,11 @@ function bullet(children: TextRun[]): Paragraph {
 
 export function buildTemplateDocx(cv: CvData): Document {
   const children: Paragraph[] = [];
+  const linkedin = linkedinUrl(cv.linkedin);
 
-  // Name + contact line, centered
+  // Name + contact line, centered. Email/Tel stay plain text; LinkedIn is a
+  // real clickable hyperlink (not just styled to look like one) so it
+  // actually opens the profile from Word/a PDF export.
   children.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
@@ -80,10 +84,21 @@ export function buildTemplateDocx(cv: CvData): Document {
       alignment: AlignmentType.CENTER,
       spacing: { after: 120 },
       children: [
-        new TextRun({ ...base, text: "Email: ", size: 18 }),
-        new TextRun({ ...base, text: cv.email, size: 18, color: NAVY, underline: {} }),
-        new TextRun({ ...base, text: `  |  Tel: ${cv.phone}  |  LinkedIn: `, size: 18 }),
-        new TextRun({ ...base, text: cv.linkedin, size: 18, color: NAVY, underline: {} }),
+        new TextRun({
+          ...base,
+          text: `Email: ${cv.email}  |  Tel: ${cv.phone}${linkedin ? "  |  " : ""}`,
+          size: 18,
+        }),
+        ...(linkedin
+          ? [
+              new ExternalHyperlink({
+                link: linkedin,
+                children: [
+                  new TextRun({ ...base, text: "LinkedIn", size: 18, color: NAVY, underline: {} }),
+                ],
+              }),
+            ]
+          : []),
       ],
     }),
     new Paragraph({

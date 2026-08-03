@@ -87,11 +87,25 @@ function withDefaults(c: CvData): CvData {
   };
 }
 
+/**
+ * Normalize a LinkedIn field (often stored as "linkedin.com/in/x" or
+ * "www.linkedin.com/in/x" with no protocol) into a real https:// URL a
+ * hyperlink can point to. Returns "" if the field is empty.
+ */
+export function linkedinUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
 /** Plain-text rendition (for the .md/.txt download and for chat context). */
 export function cvToText(c: CvData): string {
   const lines: string[] = [];
   lines.push(c.name);
-  lines.push(`Email: ${c.email}  |  Tel: ${c.phone}  |  LinkedIn: ${c.linkedin}`);
+  const linkedin = linkedinUrl(c.linkedin);
+  lines.push(
+    `Email: ${c.email}  |  Tel: ${c.phone}  |  LinkedIn: ${linkedin ? `[LinkedIn](${linkedin})` : c.linkedin}`
+  );
   lines.push("", c.summary, "", "CORE COMPETENCIES");
   for (const k of c.competencies) lines.push(`- ${k.label}: ${k.text}`);
   lines.push("", "PROFESSIONAL EXPERIENCE");
