@@ -2,6 +2,7 @@
 // Same paths, same request/response shapes — components didn't have to change.
 
 import { askClaude, askClaudeJson } from "./ai";
+import { applyContact, extractContact, normalizeContact } from "./contact";
 import { CvData, isCvData } from "./cvschema";
 import { fetchJobPage } from "./jobtext";
 import {
@@ -157,10 +158,20 @@ async function analyseProfile(cv: string) {
     messages: [{ role: "user", content: cv.slice(0, 60000) }],
   });
   mutate((db) => {
+    // Pre-fill contact details from the CV text, but never clobber values the
+    // user has already confirmed by hand — those are the source of truth.
+    const found = extractContact(cv);
+    const existing = normalizeContact(db.profile?.contact);
     db.profile = {
       raw_cv: cv,
       summary: result.summary ?? "",
       structured: JSON.stringify(result.structured ?? {}),
+      contact: {
+        name: existing.name || found.name,
+        email: existing.email || found.email,
+        phone: existing.phone || found.phone,
+        linkedin: existing.linkedin || found.linkedin,
+      },
       updated_at: now(),
     };
     db.questions = db.questions.filter((q) => q.answer?.trim());
@@ -187,7 +198,13 @@ async function generateCv(jobId: number) {
   if (!isCvData(cvData)) {
     throw new ApiError("The generated CV came back malformed — try again.");
   }
-  const cleaned = JSON.stringify(cvData, null, 2);
+  // Contact details come from the profile, never from the model — see
+  // lib/contact.ts for why.
+  const cleaned = JSON.stringify(
+    applyContact(cvData, normalizeContact(db.profile.contact)),
+    null,
+    2
+  );
   return mutate((db) => {
     const maxV = Math.max(0, ...db.cvs.filter((c) => c.job_id === jobId).map((c) => c.version));
     const cv = { id: nextId(db), job_id: jobId, version: maxV + 1, content: cleaned, created_at: now() };
@@ -243,7 +260,15 @@ ${latestCv ? `CURRENT TAILORED CV (v${latestCv.version}):\n${latestCv.content}` 
       let content: string | null = null;
       try {
         const parsed = JSON.parse(cvMatch[1].trim());
-        if (isCvData(parsed)) content = JSON.stringify(parsed, null, 2);
+        if (isCvData(parsed)) {
+          // Same deterministic contact injection as generateCv, so a chat
+          // revision can't drop the contact line either.
+          content = JSON.stringify(
+            applyContact(parsed, normalizeContact(db.profile.contact)),
+            null,
+            2
+          );
+        }
       } catch {
         content = null;
       }
@@ -276,6 +301,13 @@ export async function localApi(
         }
       });
       return { ok: true };
+    }
+    if (parts[1] === "contact" && method === "POST") {
+      return mutate((db) => {
+        db.profile.contact = normalizeContact(body.contact);
+        db.profile.updated_at = now();
+        return { contact: db.profile.contact };
+      });
     }
     if (method === "POST") return analyseProfile(body.cv);
     const db = loadDb();

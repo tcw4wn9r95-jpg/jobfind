@@ -35,8 +35,10 @@ Respond with JSON only, in this exact shape:
 Scoring guide: 85-100 exceptional fit, 70-84 strong fit worth applying, 50-69 partial fit — apply with a targeted angle, 30-49 stretch, below 30 poor use of the candidate's time. Be calibrated: most real matches land between 40 and 85.`;
 
 export const CV_JSON_SCHEMA = `{
-  "name": "full name",
-  "email": "", "phone": "", "linkedin": "",
+  "name": "candidate's full name, exactly as in their profile",
+  "email": "candidate's email address, copied exactly from their profile",
+  "phone": "candidate's phone number, copied exactly from their profile",
+  "linkedin": "candidate's LinkedIn profile URL, copied exactly from their profile",
   "summary": "3-4 line professional summary paragraph",
   "competencies": [{ "label": "Competency name", "text": "specifics, tools, scale" }],
   "experience": [{
