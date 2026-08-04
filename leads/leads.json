@@ -1,31 +1,70 @@
 {
-  "generated_at": "2026-08-03T10:08:51.780Z",
+  "generated_at": "2026-08-04T09:13:35.379Z",
   "leads": [
     {
-      "id": "kixy5l",
-      "title": "Subject Matter Expert – Manufacturing & Industrial Operations (English/German) – Remote",
-      "company": "LILT (Production)",
-      "location": "Germany (Remote)",
-      "url": "https://www.arbeitnow.com/jobs/companies/lilt-production/subject-matter-expert-manufacturing-industrial-operations-english-german-remote-berlin-247498",
-      "posted_at": "2026-08-03",
-      "snippet": "About The Opportunity We are looking for experienced Manufacturing and Industrial Operations professionals to support a cutting-edge AI benchmarking project focused on industrial, production, and supply chain environments. As a Subject Matter Expert, you will create and review realistic, high-quality scenarios that reflect operational, engineering, procurement, production, logistics, and inventory management challenges across manufacturing facilities and industrial operations. Your expertise will help ensure AI systems understand and respond accurately within one of India's most strategically ",
+      "id": "1ljrbqy",
+      "title": "Product Manager — DeFi Products & Applications",
+      "company": "0G",
+      "location": "Remote · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/0g/remote-product-manager-defi-products-applications-327235",
+      "posted_at": "2026-08-04",
+      "snippet": "About the Role We're looking for a Product Manager to own and drive DeFi products spanning liquid staking, token launch infrastructure, and on-chain payment rails. You'll work at the intersection of protocol design, tokenomics, DeFi integrations, and regulatory strategy — translating complex on-chain mechanics into products that users trust and adopt. This is a high-ownership role for someone who understands DeFi deeply and can move fluidly between smart contract mechanics, liquidity strategy, partnership development, and go-to-market execution. Core Responsibilities Define product strategy, r",
       "source": "arbeitnow",
-      "score": 60,
+      "score": 62,
       "location_tier": "uncertain",
-      "location_note": "Remote — Germany, verify it covers Luxembourg"
+      "location_note": "Remote — region unclear, verify"
     },
     {
-      "id": "8bblo8",
-      "title": "Customer Operations Associate (f/m/x)",
-      "company": "Doinstruct",
-      "location": "Remote within Germany",
-      "url": "https://www.arbeitnow.com/jobs/companies/doinstruct/customer-operations-associate-berlin-39142",
-      "posted_at": "2026-08-03",
-      "snippet": "doinstruct builds training software for the frontline workforce: shift supervisors, machine operators, and field teams at manufacturers, logistics companies, and industrial enterprises. For these companies, getting people trained, keeping them compliant, and making sure they can do their job is how daily operations run. Series A, 400+ customers, below 2% churn. When the software breaks or stops making sense, the consequences are immediate. A Schichtleiter is locked out 30 minutes before a morning training. A manager needs a certificate for a compliance audit on Friday, and it hasn't appeared i",
+      "id": "clyrrc",
+      "title": "Product Manager — DeFi Products & Applications",
+      "company": "0G",
+      "location": "Remote",
+      "url": "https://www.arbeitnow.co.uk/jobs/companies/0g/remote-product-manager-defi-products-applications-348857",
+      "posted_at": "2026-08-04",
+      "snippet": "About the Role We're looking for a Product Manager to own and drive DeFi products spanning liquid staking, token launch infrastructure, and on-chain payment rails. You'll work at the intersection of protocol design, tokenomics, DeFi integrations, and regulatory strategy — translating complex on-chain mechanics into products that users trust and adopt. This is a high-ownership role for someone who understands DeFi deeply and can move fluidly between smart contract mechanics, liquidity strategy, partnership development, and go-to-market execution. Core Responsibilities Define product strategy, r",
       "source": "arbeitnow",
-      "score": 55,
+      "score": 62,
       "location_tier": "uncertain",
-      "location_note": "Remote — Germany, verify it covers Luxembourg"
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "25ejpg",
+      "title": "Manager, Product Marketing",
+      "company": "SoSafe",
+      "location": "Remote · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/sosafe/remote-manager-product-marketing-178746",
+      "posted_at": "2026-08-03",
+      "snippet": "SoSafe has the ambition to become the leading human risk management provider in Europe. Our award-winning awareness platform triggers behavioural change by providing effective and engaging training and simulations on cybersecurity and data protection. Cybercrime is costing the world >$10 trillion annually and growing by 15% p.a. - we invite you to be part of the solution! This role owns that story, and the model to deliver it. You will set the portfolio level messaging not as a collection of features or a list of releases, but as a category-defining platform with a clear point of view, govern ",
+      "source": "arbeitnow",
+      "score": 62,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "wfxk4o",
+      "title": "Data Engineer",
+      "company": "Pergolux",
+      "location": "Berlin | Global Team",
+      "url": "https://www.arbeitnow.com/jobs/companies/pergolux/data-engineer-berlin-36164",
+      "posted_at": "2026-08-04",
+      "snippet": "As a Data Engineer at PERGOLUX , you will build and own the data pipelines that enable fast, reliable operational insights across the business. Your work ensures the company can trust its data, automate confidently, and make high-impact decisions in real time. You will join a lean, senior data team where reliability, clarity, and business value—not technical complexity—define success. At PERGOLUX , we combine Scandinavian-inspired design with a collaborative, ambitious culture grounded in integrity, innovation, and unity. What You’ll Do Build and maintain a dependable ingestion and delivery la",
+      "source": "arbeitnow",
+      "score": 45,
+      "location_tier": "worldwide",
+      "location_note": "Remote — worldwide"
+    },
+    {
+      "id": "npp9x0",
+      "title": "Head of Product & Engineering (m/w/d)",
+      "company": "CKM Group",
+      "location": "Remote",
+      "url": "https://www.arbeitnow.co.uk/jobs/companies/ckm-group/remote-head-of-product-engineering-193148",
+      "posted_at": "2026-08-04",
+      "snippet": "Intro Die CKM Group bündelt Expertise aus verschiedenen Bereichen, um Fortschritt und Innovation in der Gesundheitsversorgung voranzutreiben. Unser Zusammenschluss aus Klinik, Labor, telemedizinischem Service und IT-Unternehmen steht für die Entwicklung moderner und effektiver Lösungen im Gesundheitswesen. Unser Ziel ist es, durch präventive Dienstleistungsmedizin, eHealth und Public Health eine führende und wegweisende Rolle im Gesundheitssystem von morgen einzunehmen. Dabei setzen wir auf smarte Logistik, Digitalisierung, Diagnostik und individuelle Prävention. Wir denken Gesundheitsversorgu",
+      "source": "arbeitnow",
+      "score": 40,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
     }
   ]
 }
