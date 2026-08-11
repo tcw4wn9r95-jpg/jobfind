@@ -1,16 +1,29 @@
 {
-  "generated_at": "2026-08-10T08:08:35.332Z",
+  "generated_at": "2026-08-11T07:41:22.119Z",
   "leads": [
     {
-      "id": "1y1ctfo",
-      "title": "Senior Product Manager — Platform Experiences",
-      "company": "jobs - Personio",
-      "location": "Remote (Deutschland)",
-      "url": "https://www.arbeitnow.com/jobs/companies/jobs-personio/remote-senior-product-manager-platform-experiences-38975",
-      "posted_at": "2026-08-09",
-      "snippet": "Find more English Speaking Jobs in Germany on Arbeitnow",
+      "id": "1w6bc56",
+      "title": "Technical Product Manager (IntelliJ Scala Plugin)",
+      "company": "jetbrains",
+      "location": "Berlin; Munich; Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/jetbrains/remote-technical-product-manager-intellij-scala-plugin-271563",
+      "posted_at": "2026-08-10",
+      "snippet": "At JetBrains, we care deeply about developer tools and the code-writing experience. The Scala plugin for IntelliJ IDEA helps developers work with Scala every day. Supporting that experience means understanding real-world development workflows, staying close to user needs, and continuously improving the tools developers rely on. We’re looking for a Technical Product Manager to help improve IntelliJ IDEA’s Scala support. This is a hands-on role focused on understanding developer needs and turning them into practical product improvements. You will work closely with engineers, experiment with mode",
       "source": "arbeitnow",
-      "score": 57,
+      "score": 62,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "1xcu28d",
+      "title": "Product Engineer",
+      "company": "MedMatic GmbH",
+      "location": "Munich · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/medmatic-gmbh/product-engineer-munich-30842",
+      "posted_at": "2026-08-10",
+      "snippet": "Über uns Der zunehmende Kostendruck im deutschen Gesundheitswesen stellt Krankenhäuser vor eine große Herausforderung: Sie müssen immer komplexere Anforderungen erfüllen, um ihre erbrachten Leistungen vollständig und korrekt vergütet zu bekommen. Gleichzeitig arbeiten bereits mehr als 80 Prozent der deutschen Krankenhäuser defizitär. Mit unserer KI-Lösung unterstützen wir bereits zahlreiche öffentliche, private und kirchliche Krankenhäuser in ganz Deutschland dabei, den gesamten Prozess von der Behandlung bis zur Bezahlung zu automatisieren und zu optimieren. Unser Leistungsspektrum reicht von",
+      "source": "arbeitnow",
+      "score": 40,
       "location_tier": "uncertain",
       "location_note": "Remote — region unclear, verify"
     }
