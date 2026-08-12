@@ -1,31 +1,18 @@
 {
-  "generated_at": "2026-08-11T07:41:22.119Z",
+  "generated_at": "2026-08-12T07:55:33.906Z",
   "leads": [
     {
-      "id": "1w6bc56",
-      "title": "Technical Product Manager (IntelliJ Scala Plugin)",
-      "company": "jetbrains",
-      "location": "Berlin; Munich; Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/jetbrains/remote-technical-product-manager-intellij-scala-plugin-271563",
-      "posted_at": "2026-08-10",
-      "snippet": "At JetBrains, we care deeply about developer tools and the code-writing experience. The Scala plugin for IntelliJ IDEA helps developers work with Scala every day. Supporting that experience means understanding real-world development workflows, staying close to user needs, and continuously improving the tools developers rely on. We’re looking for a Technical Product Manager to help improve IntelliJ IDEA’s Scala support. This is a hands-on role focused on understanding developer needs and turning them into practical product improvements. You will work closely with engineers, experiment with mode",
+      "id": "9kbs2r",
+      "title": "Senior Strategy & Operations Manager (f/m/d)",
+      "company": "plancraft",
+      "location": "Remote (within Germany)",
+      "url": "https://www.arbeitnow.com/jobs/companies/plancraft/remote-senior-strategy-operations-manager-219900",
+      "posted_at": "2026-08-12",
+      "snippet": "OUR PURPOSE AT PLANCRAFT Building the backbone of European trades together – with AI-first software. We’re not just building software – we’re on a mission to create space for contractors & tradespeople by equipping them with AI solutions that work the way they do: fast, practical, and AI-first. With Tier 1 Investors from Europe and the US, like Headline and Creandum as well as 30,000+ tradespeople as customer base, we’re scaling across Europe to turn scattered tradespeople into thriving communities. We believe in zero admin, not zero personality – and we build every feature with the people in ",
       "source": "arbeitnow",
-      "score": 62,
+      "score": 67,
       "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
-    },
-    {
-      "id": "1xcu28d",
-      "title": "Product Engineer",
-      "company": "MedMatic GmbH",
-      "location": "Munich · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/medmatic-gmbh/product-engineer-munich-30842",
-      "posted_at": "2026-08-10",
-      "snippet": "Über uns Der zunehmende Kostendruck im deutschen Gesundheitswesen stellt Krankenhäuser vor eine große Herausforderung: Sie müssen immer komplexere Anforderungen erfüllen, um ihre erbrachten Leistungen vollständig und korrekt vergütet zu bekommen. Gleichzeitig arbeiten bereits mehr als 80 Prozent der deutschen Krankenhäuser defizitär. Mit unserer KI-Lösung unterstützen wir bereits zahlreiche öffentliche, private und kirchliche Krankenhäuser in ganz Deutschland dabei, den gesamten Prozess von der Behandlung bis zur Bezahlung zu automatisieren und zu optimieren. Unser Leistungsspektrum reicht von",
-      "source": "arbeitnow",
-      "score": 40,
-      "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
+      "location_note": "Remote — Germany, verify it covers Luxembourg"
     }
   ]
 }
