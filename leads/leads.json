@@ -1,70 +1,18 @@
 {
-  "generated_at": "2026-08-14T07:53:53.774Z",
+  "generated_at": "2026-08-15T07:00:52.937Z",
   "leads": [
     {
-      "id": "iv6pjw",
-      "title": "Lead Technical Product Manager, Rail Integrations (all genders)",
-      "company": "Distribusion Technologies",
-      "location": "Remote job · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/distribusion-technologies/remote-lead-technical-product-manager-rail-integrations-all-genders-berlin-362994",
-      "posted_at": "2026-08-13",
-      "snippet": "Distribusion is the world’s leading ground transportation marketplace and gives travellers seamless access to ground transportation online, from search to ticket purchase. We have built a cutting-edge B2B technology platform that connects bus, rail, and ferry operators in 70+ countries with the biggest online retailers, including Google Maps and Booking.com . We are shaping the future of travel and building the largest global network of transport providers and retailers. We are one of the fastest-growing startups in travel, backed by leading venture capital investors including TQ Ventures, Lig",
+      "id": "11gr0sr",
+      "title": "Head of Product (f/m/d)",
+      "company": "plancraft",
+      "location": "Remote (within Germany)",
+      "url": "https://www.arbeitnow.com/jobs/companies/plancraft/remote-head-of-product-198990",
+      "posted_at": "2026-08-15",
+      "snippet": "OUR PURPOSE AT PLANCRAFT Building the backbone of European trades together – with AI-first software. We’re not just building software – we’re on a mission to create space for contractors & tradespeople by equipping them with AI solutions that work the way they do: fast, practical, and AI-first. With Tier 1 Investors from Europe and the US, like Headline and Creandum as well as 30,000+ tradespeople as customer base, we’re scaling across Europe to turn scattered tradespeople into thriving communities. We believe in zero admin, not zero personality – and we build every feature with the people in ",
       "source": "arbeitnow",
-      "score": 62,
+      "score": 45,
       "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
-    },
-    {
-      "id": "2ejz9u",
-      "title": "Product Manager",
-      "company": "Resourceful Talent Group",
-      "location": "Remote",
-      "url": "https://remoteOK.com/remote-jobs/remote-product-manager-resourceful-talent-group-1136579",
-      "posted_at": "2026-08-13",
-      "snippet": "We are looking for a Russian-speaking, hands-on Project Manager with strong Product Management skills to join a small, early-stage fintech environment. You will work directly with the CTO, engineering team, and business stakeholders to turn incomplete business ideas into clear product requirements, user flows, wireframes, prioritized backlogs, and executable delivery plans. This is a full-time role working EST hours. Fintech experience is preferred. Responsibilities Turn vague or incomplete business requests into clear requirements, user flows, low-fidelity wireframes, user stories, acceptance",
-      "source": "remoteok",
-      "score": 62,
-      "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
-    },
-    {
-      "id": "633x10",
-      "title": "Benefits Operations Specialist - EMEA",
-      "company": "Remote",
-      "location": "EMEA",
-      "url": "https://jobicy.com/jobs/145790-benefits-operations-specialist-emea",
-      "posted_at": "2026-08-13",
-      "snippet": "About Remote Remote is solving modern organizations’ biggest challenge – navigating global employment compliantly with ease. We make it possible for businesses of all sizes to recruit, pay, and manage international teams. With our core values at heart and future focused work culture, our team works tirelessly on ambitious problems, asynchronously, around the world. You&hellip;",
-      "source": "jobicy",
-      "score": 59,
-      "location_tier": "eu",
-      "location_note": "Remote — EU-wide"
-    },
-    {
-      "id": "4t9s08",
-      "title": "Senior Mechanical Product Engineer (m/w/d)",
-      "company": "ANGEHEUERT GmbH",
-      "location": "Homeoffice · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/angeheuert-gmbh/remote-senior-mechanical-product-engineer-allgau-428718",
-      "posted_at": "2026-08-14",
-      "snippet": "Senior Product Engineer Technisch anspruchsvolle Produkte entstehen nicht durch Standardlösungen. Unser Kunde entwickelt hochpräzise Baugruppen für Anwendungen in Medizintechnik, Halbleiterindustrie und analytischer Hightech. Als Senior Product Engineer bewertest du technische Anforderungen, entwickelst wirtschaftlich umsetzbare Lösungen und begleitest Produkte von der ersten Idee bis zur erfolgreichen Serienfertigung. Dabei kombinierst du Entwicklungsarbeit mit technischem Verständnis für Fertigung, Machbarkeit und industrielle Umsetzung. Deine Benefits als Senior Product Engineer Top Gehalt:",
-      "source": "arbeitnow",
-      "score": 46,
-      "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
-    },
-    {
-      "id": "1fqpino",
-      "title": "Technical SAP Product Owner (m/w/d)",
-      "company": "Natuvion GmbH",
-      "location": "Remote job · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/natuvion-gmbh/remote-technical-sap-product-owner-berlin-118589",
-      "posted_at": "2026-08-13",
-      "snippet": "Als Technical SAP Product Owner (m/w/d) übernimmst du eine Schlüsselrolle in der Weiterentwicklung unseres Natuvion DCS Produktportfolios. Du arbeitest eng mit internen Stakeholdern, Partnern, Kunden sowie funktionsübergreifenden Delivery-Teams zusammen, um sicherzustellen, dass unsere Produkte echten Mehrwert schaffen und Natuvion strategisch voranbringen. Deine Aufgaben: Verantwortung für die Produktvision, Strategie und Zielerreichung eines oder mehrerer Produkte innerhalb des Natuvion DCS Portfolios rund um den Themenkomplex SAP Datenmigration & -transformation (inkl. Anonymisierung, Valid",
-      "source": "arbeitnow",
-      "score": 40,
-      "location_tier": "uncertain",
-      "location_note": "Remote — region unclear, verify"
+      "location_note": "Remote — Germany, verify it covers Luxembourg"
     }
   ]
 }
