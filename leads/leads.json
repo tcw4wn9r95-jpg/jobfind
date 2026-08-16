@@ -1,18 +1,70 @@
 {
-  "generated_at": "2026-08-15T07:00:52.937Z",
+  "generated_at": "2026-08-16T07:03:13.091Z",
   "leads": [
     {
-      "id": "11gr0sr",
-      "title": "Head of Product (f/m/d)",
-      "company": "plancraft",
-      "location": "Remote (within Germany)",
-      "url": "https://www.arbeitnow.com/jobs/companies/plancraft/remote-head-of-product-198990",
+      "id": "1eqf7au",
+      "title": "Product Manager, Fraud and Compliance",
+      "company": "Remote",
+      "location": "EMEA",
+      "url": "https://jobicy.com/jobs/146500-product-manager-fraud-and-compliance",
+      "posted_at": "2026-08-16",
+      "snippet": "About Remote Remote is solving modern organizations’ biggest challenge – navigating global employment compliantly with ease. We make it possible for businesses of all sizes to recruit, pay, and manage international teams. With our core values at heart and future focused work culture, our team works tirelessly on ambitious problems, asynchronously, around the world. You&hellip;",
+      "source": "jobicy",
+      "score": 71,
+      "location_tier": "eu",
+      "location_note": "Remote — EU-wide"
+    },
+    {
+      "id": "2edixu",
+      "title": "Senior Product Manager, Remote Build",
+      "company": "Remote",
+      "location": "EMEA",
+      "url": "https://jobicy.com/jobs/146023-senior-product-manager-remote-build",
       "posted_at": "2026-08-15",
-      "snippet": "OUR PURPOSE AT PLANCRAFT Building the backbone of European trades together – with AI-first software. We’re not just building software – we’re on a mission to create space for contractors & tradespeople by equipping them with AI solutions that work the way they do: fast, practical, and AI-first. With Tier 1 Investors from Europe and the US, like Headline and Creandum as well as 30,000+ tradespeople as customer base, we’re scaling across Europe to turn scattered tradespeople into thriving communities. We believe in zero admin, not zero personality – and we build every feature with the people in ",
+      "snippet": "About Remote Remote is solving modern organizations’ biggest challenge – navigating global employment compliantly with ease. We make it possible for businesses of all sizes to recruit, pay, and manage international teams. With our core values at heart and future focused work culture, our team works tirelessly on ambitious problems, asynchronously, around the world. You&hellip;",
+      "source": "jobicy",
+      "score": 71,
+      "location_tier": "eu",
+      "location_note": "Remote — EU-wide"
+    },
+    {
+      "id": "cz4dwx",
+      "title": "Principal Product Manager- Conversational AI",
+      "company": "Hopper",
+      "location": "England - Remote",
+      "url": "https://www.arbeitnow.co.uk/jobs/companies/hopper/remote-principal-product-manager-conversational-ai-260822",
+      "posted_at": "2026-08-16",
+      "snippet": "About the Role HTS Assist is Hopper's agentic AI assistant for travel, resolving real customer issues like flight changes, cancellations, refunds, and bookings over chat and voice for some of the largest travel brands and enterprises in the world. As Principal Product Manager, you will own the customer-facing agent end to end: the conversations, the interface, and the experience our partners put in front of millions of travelers. This is a deliberately design-leaning role, and you will be the day-to-day design decision-maker, shaping flows and interfaces directly in close partnership with part",
+      "source": "arbeitnow",
+      "score": 67,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "4upz0s",
+      "title": "Product Manager KI // AI // (100% remote)",
+      "company": "Workidentity",
+      "location": "Remote",
+      "url": "https://www.arbeitnow.co.uk/jobs/companies/workidentity/product-manager-ki-ai-100-remote-182721",
+      "posted_at": "2026-08-16",
+      "snippet": "Einleitung Product Manager (gn) KI // AI // Agents Wie viele KI-Agenten hast du parallel im Einsatz? Wer bei dieser Frage nicht kurz überlegen muss, weil die Antwort selbstverständlich ist, liest hier weiter. Unser Mandant entwickelt eine KI-Business-Plattform für Unternehmen und treibt sie konsequent auf das nächste Level. Gesucht wird keine Person, die KI erklärt, sondern jemand, der KI-Architekturen baut, die intern wie bei Kundinnen und Kunden echten Mehrwert erzeugen, und der dieses Wissen gleichzeitig so vermitteln kann, dass andere damit arbeiten können. Der Standort ist flexibel, 100% ",
+      "source": "arbeitnow",
+      "score": 62,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "e2m5ue",
+      "title": "Founding Product Designer",
+      "company": "paddy",
+      "location": "Bielefeld · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/paddy/founding-product-designer-bielefeld-417897",
+      "posted_at": "2026-08-15",
+      "snippet": "paddy is building the agentic operating system for teaching and learning. Born out of our own experience in schools, our team is developing an AI platform deeply embedded in day-to-day teaching, from lesson preparation and delivery to analysis. Today, thousands of teachers and tens of thousands of students use paddy every day. Our mission: to meaningfully reduce teachers’ workload while improving teaching quality, so students are better prepared for the future. Backed by strong investors such as HTGF , we are growing fast with the goal of making paddy the leading AI platform for schools in Eur",
       "source": "arbeitnow",
       "score": 45,
       "location_tier": "uncertain",
-      "location_note": "Remote — Germany, verify it covers Luxembourg"
+      "location_note": "Remote — region unclear, verify"
     }
   ]
 }
