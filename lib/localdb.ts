@@ -45,6 +45,14 @@ export type TailoredCv = {
   created_at: string;
 };
 
+export type InterviewPrepRecord = {
+  id: number;
+  job_id: number;
+  stage: string;
+  content: string; // JSON string, see lib/interview.ts
+  created_at: string;
+};
+
 export type ChatMessage = {
   id: number;
   job_id: number;
@@ -87,6 +95,7 @@ export type Db = {
   questions: Question[];
   jobs: Job[];
   cvs: TailoredCv[];
+  interview_preps: InterviewPrepRecord[];
   messages: ChatMessage[];
   contacts: Contact[];
   interactions: Interaction[];
@@ -109,6 +118,7 @@ function emptyDb(): Db {
     questions: [],
     jobs: [],
     cvs: [],
+    interview_preps: [],
     messages: [],
     contacts: [],
     interactions: [],

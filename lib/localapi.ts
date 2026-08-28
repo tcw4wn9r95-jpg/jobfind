@@ -4,6 +4,7 @@
 import { askClaude, askClaudeJson } from "./ai";
 import { applyContact, extractContact, normalizeContact } from "./contact";
 import { CvData, isCvData } from "./cvschema";
+import { InterviewPrep, isInterviewPrep } from "./interview";
 import { fetchJobPage } from "./jobtext";
 import {
   Db,
@@ -18,6 +19,7 @@ import {
   CHAT_SYSTEM_PREFIX,
   CV_GENERATION_SYSTEM,
   MATCH_SYSTEM,
+  INTERVIEW_PREP_SYSTEM,
   PROFILE_INTAKE_SYSTEM,
 } from "./prompts";
 
@@ -57,6 +59,9 @@ function jobDetail(db: Db, id: number) {
     cvs: db.cvs
       .filter((c) => c.job_id === id)
       .sort((a, b) => b.version - a.version),
+    interviewPreps: db.interview_preps
+      .filter((p) => p.job_id === id)
+      .sort((a, b) => (a.created_at < b.created_at ? 1 : -1)),
     messages: db.messages.filter((m) => m.job_id === id),
     interactions: db.interactions
       .filter((i) => i.job_id === id)
@@ -214,6 +219,48 @@ async function generateCv(jobId: number) {
   });
 }
 
+async function generateInterviewPrep(jobId: number, stage: string) {
+  const db = loadDb();
+  const job = jobOr404(db, jobId);
+  const profileText = profileContextAsText(db);
+  if (profileText.trim().length < 100) {
+    throw new ApiError("Add your CV in Profile first — the prep is built from your real experience.");
+  }
+  const latestCv = db.cvs
+    .filter((c) => c.job_id === jobId)
+    .sort((a, b) => b.version - a.version)[0];
+
+  const prep = await askClaudeJson<InterviewPrep>({
+    system: INTERVIEW_PREP_SYSTEM,
+    maxTokens: 8000,
+    messages: [
+      {
+        role: "user",
+        content: `INTERVIEW STAGE: ${stage}\n\n${profileText}\n\n=====\n\nTARGET JOB (${job.title} at ${job.company}${job.location ? `, ${job.location}` : ""}):\n${job.description.slice(0, 30000)}\n\nMATCH ANALYSIS (their real strengths and gaps for this role — use the gaps to build the challenges section):\n${job.analysis ?? "not analysed"}${latestCv ? `\n\nTAILORED CV THEY ARE SUBMITTING (interviewers will ask about what is on it):\n${latestCv.content.slice(0, 12000)}` : ""}`,
+      },
+    ],
+  });
+  if (!isInterviewPrep(prep)) {
+    throw new ApiError("The prep pack came back malformed — try again.");
+  }
+  return mutate((db) => {
+    const record = {
+      id: nextId(db),
+      job_id: jobId,
+      stage,
+      content: JSON.stringify({ ...prep, stage }, null, 2),
+      created_at: now(),
+    };
+    // One pack per stage — regenerating replaces that stage's pack.
+    db.interview_preps = db.interview_preps.filter(
+      (p) => !(p.job_id === jobId && p.stage === stage)
+    );
+    db.interview_preps.push(record);
+    jobOr404(db, jobId).updated_at = now();
+    return { prep: record };
+  });
+}
+
 async function chat(jobId: number, message: string) {
   if (!message?.trim()) throw new ApiError("Empty message");
   const db = loadDb();
@@ -342,6 +389,7 @@ export async function localApi(
           jobOr404(db, id);
           db.jobs = db.jobs.filter((j) => j.id !== id);
           db.cvs = db.cvs.filter((c) => c.job_id !== id);
+          db.interview_preps = db.interview_preps.filter((p) => p.job_id !== id);
           db.messages = db.messages.filter((m) => m.job_id !== id);
           db.interactions = db.interactions.filter((i) => i.job_id !== id);
           for (const c of db.contacts) if (c.job_id === id) c.job_id = null;
@@ -352,6 +400,7 @@ export async function localApi(
     }
     if (parts[2] === "cv" && method === "POST") return generateCv(id);
     if (parts[2] === "chat" && method === "POST") return chat(id, body.message);
+    if (parts[2] === "interview" && method === "POST") return generateInterviewPrep(id, body.stage);
   }
 
   if (parts[0] === "contacts") {

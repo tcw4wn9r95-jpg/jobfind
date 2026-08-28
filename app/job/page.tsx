@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
   Markdown,
   PageHeader,
@@ -15,8 +15,9 @@ import {
 } from "@/components/ui";
 import { downloadCv } from "@/lib/cvdocx";
 import { CvPreview } from "@/components/cv-preview";
+import { InterviewCoach } from "@/components/interview-prep";
 
-type Tab = "match" | "cv" | "chat" | "activity";
+type Tab = "match" | "cv" | "interview" | "chat" | "activity";
 
 export default function JobPage() {
   return (
@@ -30,11 +31,14 @@ function JobPageInner() {
   const params = { id: useSearchParams().get("id") ?? "" };
   const { data, loading, reload } = useApi<any>(`/api/jobs/${params.id}`);
   const [tab, setTab] = useState<Tab>("match");
+  // Seeds the chat box when jumping from the interview coach into a mock round
+  const [chatSeed, setChatSeed] = useState<string>("");
   const router = useRouter();
 
   if (loading) return <Spinner label="Loading…" />;
   if (!data?.job) return <p className="text-ink-500">Job not found.</p>;
-  const { job, cvs, messages, interactions, contacts } = data;
+  const { job, cvs, interviewPreps = [], messages, interactions, contacts } = data;
+  const inInterviewPhase = job.status === "interview" || job.status === "offer";
   const analysis = safeParse(job.analysis);
 
   async function setStatus(status: string) {
@@ -81,6 +85,7 @@ function JobPageInner() {
           [
             ["match", "Match analysis"],
             ["cv", `Tailored CV${cvs.length ? ` (${cvs.length})` : ""}`],
+            ["interview", `Interview coach${interviewPreps.length ? ` (${interviewPreps.length})` : inInterviewPhase ? " ●" : ""}`],
             ["chat", "Claude chat"],
             ["activity", "Activity & contacts"],
           ] as [Tab, string][]
@@ -103,7 +108,29 @@ function JobPageInner() {
         <MatchTab job={job} analysis={analysis} onApply={() => { setStatus("applied"); setTab("cv"); }} />
       )}
       {tab === "cv" && <CvTab jobId={params.id} job={job} cvs={cvs} reload={reload} />}
-      {tab === "chat" && <ChatTab jobId={params.id} messages={messages} reload={reload} />}
+      {tab === "interview" && (
+        <InterviewCoach
+          jobId={Number(params.id)}
+          job={job}
+          preps={interviewPreps}
+          reload={reload}
+          onPractice={(stage) => {
+            setChatSeed(
+              `Let's run a mock ${stage.toLowerCase()} for this role. Play the interviewer: ask me one question at a time, wait for my answer, then give me short, specific feedback on it (what landed, what to tighten, whether I used a real example well) before moving to the next. Start with your first question.`
+            );
+            setTab("chat");
+          }}
+        />
+      )}
+      {tab === "chat" && (
+        <ChatTab
+          jobId={params.id}
+          messages={messages}
+          reload={reload}
+          seed={chatSeed}
+          onSeedUsed={() => setChatSeed("")}
+        />
+      )}
       {tab === "activity" && (
         <ActivityTab jobId={params.id} interactions={interactions} contacts={contacts} reload={reload} />
       )}
@@ -327,15 +354,28 @@ function ChatTab({
   jobId,
   messages,
   reload,
+  seed,
+  onSeedUsed,
 }: {
   jobId: string;
   messages: any[];
   reload: () => void;
+  seed?: string;
+  onSeedUsed?: () => void;
 }) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Arriving from "Practice with Claude": drop the mock-interview kickoff into
+  // the box (not auto-sent, so it can be tweaked first).
+  useEffect(() => {
+    if (seed) {
+      setInput(seed);
+      onSeedUsed?.();
+    }
+  }, [seed, onSeedUsed]);
 
   async function send() {
     const message = input.trim();
