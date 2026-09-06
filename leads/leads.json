@@ -1,31 +1,44 @@
 {
-  "generated_at": "2026-09-05T10:43:03.999Z",
+  "generated_at": "2026-09-06T11:04:49.308Z",
   "leads": [
     {
-      "id": "182p8gr",
-      "title": "Senior Product Manager - Human AI Collaboration (all genders)",
-      "company": "wingmaite GmbH",
-      "location": "Munich · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/wingmaite-gmbh/senior-product-manager-human-ai-collaboration-all-genders-munich-124059",
-      "posted_at": "2026-09-04",
-      "snippet": "We're looking for someone to own Human Understanding &#x26; Adaptive Collaboration as one of wingmaite's four foundational product disciplines. This isn't a traditional product role, you won't simply manage features or execute roadmaps. You'll define how wingmaite understands humans and collaborates with them, building the discipline through which experts externalize knowledge that only they currently hold. Tasks What you'll do Enterprise Knowledge Elicitation: Define how wingmaite interviews experts, asks follow-up questions, reconstructs decisions and surfaces tacit knowledge Adaptive Collab",
+      "id": "1tzuj3l",
+      "title": "(Senior) Sales Operations Manager (gn)",
+      "company": "Bikeleasing",
+      "location": "Remote Deutschland",
+      "url": "https://www.arbeitnow.com/jobs/companies/bikeleasing/remote-senior-sales-operations-manager-gn-363814",
+      "posted_at": "2026-09-05",
+      "snippet": "Your mission The Bikeleasing Group stands for modern mobility and employee benefit solutions that intelligently connect companies, specialist retailers and employees. With more than 80,000 corporate customers, we are one of the leading providers in this field and are actively shaping the future of work. As a Senior Sales Operations Manager (gn), you will play a central role in our sales organisation. You will develop scalable processes, shape our CRM and sales tool landscape, and use automation, AI and data-driven reporting to create greater efficiency and transparency. You will work closely w",
       "source": "arbeitnow",
-      "score": 62,
+      "score": 67,
       "location_tier": "uncertain",
       "location_note": "Remote — region unclear, verify"
     },
     {
-      "id": "1eda1hr",
-      "title": "Sales Executive",
-      "company": "Andercore",
+      "id": "10gq1qy",
+      "title": "Senior Product Design Engineer",
+      "company": "Duck Duck Go",
       "location": "Remote",
-      "url": "https://www.arbeitnow.co.uk/jobs/companies/andercore/remote-sales-executive-118673",
-      "posted_at": "2026-09-04",
-      "snippet": "About Andercore Andercore is the AI-native supplier of industrial materials for energy, infrastructure, and construction in wholesale and beyond. We trade with global suppliers and distribute to European customers on our own account. Our AI runs the full trade and distribution end-to-end: sourcing, quality, pricing, sales, logistics, and embedded financing. For the customer, it feels like buying from their preferred local supplier; for our partners, it is the most convenient and safe way to do business across borders. Behind it, our software and agentic AI do the heavy lifting that used to tak",
+      "url": "https://www.arbeitnow.fr/jobs/companies/duck-duck-go/remote-senior-product-design-engineer-145790",
+      "posted_at": "2026-09-06",
+      "snippet": "Who We Are Hi, we're DuckDuckGo, the online protection company and remote-first team of 300+ on a mission to raise the standard of trust online. Founded in 2008 and profitable since 2014, annual revenue now exceeds $100m USD and millions use our browser on Mac , Windows , iOS , and Android , our search engine , and the latest — Privacy Pro . Our culture of trust, inclusivity, and empowered project management underpins everything we do, where each team member takes full ownership of their projects, from scoping and execution to postmortem. If you're seeking end-to-end ownership of your work — y",
       "source": "arbeitnow",
-      "score": 37,
+      "score": 51,
       "location_tier": "uncertain",
       "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "wlosy6",
+      "title": "(Senior) Software Developer Frontend / React (m/w/d)",
+      "company": "Athereon",
+      "location": "Saarbrücken",
+      "url": "https://www.arbeitnow.com/jobs/companies/athereon/senior-software-developer-frontend-react-saarbrucken-42438",
+      "posted_at": "2026-09-06",
+      "snippet": "Your mission You develop features and improvements across the full stack of our SaaS application – both on the backend (Django / Django REST Framework, FastAPI) and the frontend (React / TypeScript) – consistently leveraging AI-assisted development tools like GitHub Copilot or Cursor to deliver faster and more efficiently. As an experienced software developer, you collaborate closely with both development teams and coordinate with all relevant stakeholders (product management, UX, sales, etc.). You actively help drive our AI First Development Culture: you explore new tools, share best practice",
+      "source": "arbeitnow",
+      "score": 50,
+      "location_tier": "neighbor",
+      "location_note": "Saarbrücken (commutable)"
     }
   ]
 }
