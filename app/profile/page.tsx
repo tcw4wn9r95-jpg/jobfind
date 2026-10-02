@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CvInput } from "@/components/cv-input";
 import { PageHeader, Spinner, api, useApi } from "@/components/ui";
 
 export default function ProfilePage() {
@@ -37,11 +38,6 @@ export default function ProfilePage() {
     }
   }
 
-  async function onUpload(file: File) {
-    const text = await file.text();
-    setCv(text);
-  }
-
   return (
     <div>
       <PageHeader
@@ -52,31 +48,22 @@ export default function ProfilePage() {
       {(!hasCv || editing) && (
         <section className="card mb-6 p-6 animate-rise">
           <h2 className="mb-1 font-bold text-ink-900">
-            {hasCv ? "Update your CV" : "Paste your CV"}
+            {hasCv ? "Update your CV" : "Add your CV"}
           </h2>
           <p className="mb-4 text-sm text-ink-500">
-            Paste the full text of your CV (or upload a .txt/.md export). I&apos;ll read it,
-            build your profile, and ask a few follow-up questions to fill any gaps.
+            Upload your CV (.docx, .pdf or .txt) or paste its full text. I&apos;ll read it, build
+            your profile, and ask a few follow-up questions to fill any gaps.
           </p>
-          <textarea
-            className="input min-h-[300px] font-mono text-xs leading-relaxed"
-            placeholder={"Jane Doe\nProduct Manager — Berlin\n\nEXPERIENCE\nSenior PM, Acme (2021–now)\n- Led checkout redesign, +18% conversion\n..."}
+          <CvInput
             value={cv}
-            onChange={(e) => setCv(e.target.value)}
+            onChange={setCv}
+            minHeight={300}
+            placeholder={"Jane Doe\nProduct Manager — Berlin\n\nEXPERIENCE\nSenior PM, Acme (2021–now)\n- Led checkout redesign, +18% conversion\n..."}
           />
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button className="btn-primary" onClick={analyse} disabled={analysing || cv.trim().length < 50}>
               {analysing ? <Spinner label="Claude is reading your CV…" /> : "Analyse my CV ✨"}
             </button>
-            <label className="btn-secondary cursor-pointer">
-              Upload .txt / .md
-              <input
-                type="file"
-                accept=".txt,.md,.markdown,text/plain"
-                className="hidden"
-                onChange={(e) => e.target.files?.[0] && onUpload(e.target.files[0])}
-              />
-            </label>
             {editing && (
               <button className="btn-ghost" onClick={() => setEditing(false)}>
                 Cancel

@@ -44,6 +44,19 @@ function Inner() {
         subtitle={`${s.job_title}${s.company ? ` · ${s.company}` : ""}${s.location ? ` · ${s.location}` : ""}`}
       />
 
+      {/^https?:\/\//i.test(s.job_url ?? "") && (
+        <p className="-mt-3 mb-4 text-sm">
+          <a
+            href={s.job_url}
+            target="_blank"
+            rel="noreferrer"
+            className="font-semibold text-indigo-600 hover:underline"
+          >
+            View the job posting ↗
+          </a>
+        </p>
+      )}
+
       <div className="card mb-6 border-indigo-200 bg-indigo-50/40 p-3 animate-rise">
         <p className="text-xs text-ink-600">
           <span className="font-bold text-ink-800">Separate workspace.</span> Everything here
