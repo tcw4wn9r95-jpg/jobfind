@@ -3,6 +3,7 @@
 
 import { askClaude, askClaudeJson } from "./ai";
 import { applyContact, extractContact, normalizeContact } from "./contact";
+import { CoachSession, newSession, normalizeSession } from "./coach";
 import { CvData, isCvData } from "./cvschema";
 import { InterviewPrep, isInterviewPrep } from "./interview";
 import { fetchJobPage } from "./jobtext";
@@ -93,6 +94,85 @@ type MatchResult = {
   keywords: string[];
 };
 
+
+// ---------------------------------------------------------------------------
+// Shared generation helpers. The owner's own flow and coaching sessions call
+// exactly these, so a coached candidate gets identical quality — the only
+// difference is which profile text and job text go in, and where the result
+// is stored.
+// ---------------------------------------------------------------------------
+
+async function runMatch(profileText: string, jobText: string, pageTitle?: string) {
+  return askClaudeJson<MatchResult>({
+    system: MATCH_SYSTEM,
+    messages: [
+      {
+        role: "user",
+        content: `${profileText}\n\n=====\n\nJOB POSTING${pageTitle ? ` (page title: ${pageTitle})` : ""}:\n${jobText.slice(0, 30000)}`,
+      },
+    ],
+  });
+}
+
+async function runCvGeneration(
+  profileText: string,
+  jobLabel: string,
+  jobDescription: string,
+  analysis: string | null
+) {
+  const cvData = await askClaudeJson<CvData>({
+    system: CV_GENERATION_SYSTEM,
+    maxTokens: 8000,
+    messages: [
+      {
+        role: "user",
+        content: `${profileText}\n\n=====\n\nTARGET JOB (${jobLabel}):\n${jobDescription.slice(0, 30000)}\n\nMATCH ANALYSIS (use the keywords/recommendations to guide emphasis — truthfully):\n${analysis ?? "n/a"}`,
+      },
+    ],
+  });
+  if (!isCvData(cvData)) {
+    throw new ApiError("The generated CV came back malformed — try again.");
+  }
+  return cvData;
+}
+
+async function runInterviewPrep(
+  profileText: string,
+  stage: string,
+  jobLabel: string,
+  jobDescription: string,
+  analysis: string | null,
+  latestCvContent?: string
+) {
+  const prep = await askClaudeJson<InterviewPrep>({
+    system: INTERVIEW_PREP_SYSTEM,
+    maxTokens: 8000,
+    messages: [
+      {
+        role: "user",
+        content: `INTERVIEW STAGE: ${stage}\n\n${profileText}\n\n=====\n\nTARGET JOB (${jobLabel}):\n${jobDescription.slice(0, 30000)}\n\nMATCH ANALYSIS (their real strengths and gaps for this role — use the gaps to build the challenges section):\n${analysis ?? "not analysed"}${latestCvContent ? `\n\nTAILORED CV THEY ARE SUBMITTING (interviewers will ask about what is on it):\n${latestCvContent.slice(0, 12000)}` : ""}`,
+      },
+    ],
+  });
+  if (!isInterviewPrep(prep)) {
+    throw new ApiError("The prep pack came back malformed — try again.");
+  }
+  return prep;
+}
+
+/** Pull a ```cv fenced block out of a chat reply, if it holds a valid CV. */
+function cvFromReply(reply: string, contact: ReturnType<typeof normalizeContact>): string | null {
+  const cvMatch = reply.match(/```cv\n([\s\S]*?)```/);
+  if (!cvMatch || cvMatch[1].trim().length <= 100) return null;
+  try {
+    const parsed = JSON.parse(cvMatch[1].trim());
+    if (!isCvData(parsed)) return null;
+    return JSON.stringify(applyContact(parsed, contact), null, 2);
+  } catch {
+    return null;
+  }
+}
+
 async function addJob(body: { url?: string; description?: string }) {
   const db = loadDb();
   const profileText = profileContextAsText(db);
@@ -119,15 +199,7 @@ async function addJob(body: { url?: string; description?: string }) {
       { needsPaste: true }
     );
   }
-  const analysis = await askClaudeJson<MatchResult>({
-    system: MATCH_SYSTEM,
-    messages: [
-      {
-        role: "user",
-        content: `${profileText}\n\n=====\n\nJOB POSTING${pageTitle ? ` (page title: ${pageTitle})` : ""}:\n${jobText.slice(0, 30000)}`,
-      },
-    ],
-  });
+  const analysis = await runMatch(profileText, jobText, pageTitle);
   return mutate((db) => {
     const job: Job = {
       id: nextId(db),
@@ -190,19 +262,12 @@ async function analyseProfile(cv: string) {
 async function generateCv(jobId: number) {
   const db = loadDb();
   const job = jobOr404(db, jobId);
-  const cvData = await askClaudeJson<CvData>({
-    system: CV_GENERATION_SYSTEM,
-    maxTokens: 8000,
-    messages: [
-      {
-        role: "user",
-        content: `${profileContextAsText(db)}\n\n=====\n\nTARGET JOB (${job.title} at ${job.company}):\n${job.description.slice(0, 30000)}\n\nMATCH ANALYSIS (use the keywords/recommendations to guide emphasis — truthfully):\n${job.analysis ?? "n/a"}`,
-      },
-    ],
-  });
-  if (!isCvData(cvData)) {
-    throw new ApiError("The generated CV came back malformed — try again.");
-  }
+  const cvData = await runCvGeneration(
+    profileContextAsText(db),
+    `${job.title} at ${job.company}`,
+    job.description,
+    job.analysis
+  );
   // Contact details come from the profile, never from the model — see
   // lib/contact.ts for why.
   const cleaned = JSON.stringify(
@@ -230,19 +295,14 @@ async function generateInterviewPrep(jobId: number, stage: string) {
     .filter((c) => c.job_id === jobId)
     .sort((a, b) => b.version - a.version)[0];
 
-  const prep = await askClaudeJson<InterviewPrep>({
-    system: INTERVIEW_PREP_SYSTEM,
-    maxTokens: 8000,
-    messages: [
-      {
-        role: "user",
-        content: `INTERVIEW STAGE: ${stage}\n\n${profileText}\n\n=====\n\nTARGET JOB (${job.title} at ${job.company}${job.location ? `, ${job.location}` : ""}):\n${job.description.slice(0, 30000)}\n\nMATCH ANALYSIS (their real strengths and gaps for this role — use the gaps to build the challenges section):\n${job.analysis ?? "not analysed"}${latestCv ? `\n\nTAILORED CV THEY ARE SUBMITTING (interviewers will ask about what is on it):\n${latestCv.content.slice(0, 12000)}` : ""}`,
-      },
-    ],
-  });
-  if (!isInterviewPrep(prep)) {
-    throw new ApiError("The prep pack came back malformed — try again.");
-  }
+  const prep = await runInterviewPrep(
+    profileText,
+    stage,
+    `${job.title} at ${job.company}${job.location ? `, ${job.location}` : ""}`,
+    job.description,
+    job.analysis,
+    latestCv?.content
+  );
   return mutate((db) => {
     const record = {
       id: nextId(db),
@@ -300,30 +360,171 @@ ${latestCv ? `CURRENT TAILORED CV (v${latestCv.version}):\n${latestCv.content}` 
     db.messages.push({ id: nextId(db), job_id: jobId, role: "assistant", content: reply, created_at: now() });
     jobOr404(db, jobId).updated_at = now();
     let newCv = null;
-    const cvMatch = reply.match(/```cv\n([\s\S]*?)```/);
-    if (cvMatch && cvMatch[1].trim().length > 100) {
-      // Revisions must be valid template JSON; anything else is ignored
-      // rather than saved as a broken version.
-      let content: string | null = null;
-      try {
-        const parsed = JSON.parse(cvMatch[1].trim());
-        if (isCvData(parsed)) {
-          // Same deterministic contact injection as generateCv, so a chat
-          // revision can't drop the contact line either.
-          content = JSON.stringify(
-            applyContact(parsed, normalizeContact(db.profile.contact)),
-            null,
-            2
-          );
-        }
-      } catch {
-        content = null;
-      }
+    // Revisions must be valid template JSON; anything else is ignored rather
+    // than saved as a broken version. Contact is injected deterministically.
+    {
+      const content = cvFromReply(reply, normalizeContact(db.profile.contact));
       if (content) {
         const maxV = Math.max(0, ...db.cvs.filter((c) => c.job_id === jobId).map((c) => c.version));
         newCv = { id: nextId(db), job_id: jobId, version: maxV + 1, content, created_at: now() };
         db.cvs.push(newCv);
       }
+    }
+    return { reply, newCv };
+  });
+}
+
+
+// ---------------------------------------------------------------------------
+// Coaching sessions. Every read and write below is scoped to a single entry in
+// db.coach_sessions; none of these functions touch db.profile, db.jobs,
+// db.cvs, db.interview_preps, db.messages, db.contacts or db.interactions.
+// ---------------------------------------------------------------------------
+
+function sessionOr404(db: Db, id: number): CoachSession {
+  const s = db.coach_sessions.find((x) => x.id === id);
+  if (!s) throw new ApiError("Coaching session not found");
+  return normalizeSession(s);
+}
+
+/** Mutate one session in place, bumping its timestamp. */
+function mutateSession<T>(id: number, fn: (s: CoachSession) => T): T {
+  return mutate((db) => {
+    const idx = db.coach_sessions.findIndex((x) => x.id === id);
+    if (idx === -1) throw new ApiError("Coaching session not found");
+    const s = normalizeSession(db.coach_sessions[idx]);
+    const result = fn(s);
+    s.updated_at = now();
+    db.coach_sessions[idx] = s;
+    return result;
+  });
+}
+
+function coachProfileText(s: CoachSession): string {
+  return `CANDIDATE CV (provided by the person being coached):\n${s.cv}`;
+}
+
+function coachJobLabel(s: CoachSession): string {
+  return `${s.job_title || "the role"}${s.company ? ` at ${s.company}` : ""}${s.location ? `, ${s.location}` : ""}`;
+}
+
+async function createCoachSession(body: any) {
+  const cv = (body.cv ?? "").trim();
+  const jobDescription = (body.job_description ?? "").trim();
+  if (cv.length < 50) throw new ApiError("Paste their CV first (at least a few lines).");
+  if (jobDescription.length < 100) {
+    throw new ApiError("Paste the job description too — at least a short paragraph.");
+  }
+
+  const analysis = await runMatch(
+    `CANDIDATE CV (provided by the person being coached):\n${cv}`,
+    jobDescription
+  );
+
+  return mutate((db) => {
+    const session = newSession(
+      nextId(db),
+      {
+        person: (body.person ?? "").trim(),
+        cv,
+        job_description: jobDescription,
+        job_title: analysis.title || "Untitled role",
+        company: analysis.company || "",
+        location: analysis.location || "",
+        // Their contact details, read from their own CV — never the owner's.
+        contact: extractContact(cv),
+      },
+      now()
+    );
+    session.analysis = JSON.stringify(analysis);
+    session.score = Math.round(analysis.score);
+    db.coach_sessions.push(session);
+    return { session };
+  });
+}
+
+async function coachGenerateCv(id: number) {
+  const s = sessionOr404(loadDb(), id);
+  const cvData = await runCvGeneration(
+    coachProfileText(s),
+    coachJobLabel(s),
+    s.job_description,
+    s.analysis
+  );
+  // Contact comes from THIS session, so the owner's details can never appear
+  // on someone else's CV.
+  const content = JSON.stringify(applyContact(cvData, normalizeContact(s.contact)), null, 2);
+  return mutateSession(id, (session) => {
+    const maxV = Math.max(0, ...session.cvs.map((c) => c.version));
+    const cv = { id: Date.now(), version: maxV + 1, content, created_at: now() };
+    session.cvs.push(cv);
+    return { cv };
+  });
+}
+
+async function coachGeneratePrep(id: number, stage: string) {
+  const s = sessionOr404(loadDb(), id);
+  const latest = [...s.cvs].sort((a, b) => b.version - a.version)[0];
+  const prep = await runInterviewPrep(
+    coachProfileText(s),
+    stage,
+    coachJobLabel(s),
+    s.job_description,
+    s.analysis,
+    latest?.content
+  );
+  return mutateSession(id, (session) => {
+    const record = {
+      id: Date.now(),
+      stage,
+      content: JSON.stringify({ ...prep, stage }, null, 2),
+      created_at: now(),
+    };
+    session.preps = session.preps.filter((p) => p.stage !== stage);
+    session.preps.push(record);
+    return { prep: record };
+  });
+}
+
+async function coachChat(id: number, message: string) {
+  if (!message?.trim()) throw new ApiError("Empty message");
+  const s = sessionOr404(loadDb(), id);
+  const latest = [...s.cvs].sort((a, b) => b.version - a.version)[0];
+  const history = s.messages.slice(-30).map((m) => ({ role: m.role, content: m.content }));
+
+  const system = `${CHAT_SYSTEM_PREFIX}
+
+You are helping a career coach prepare SOMEONE ELSE — the candidate described below is not the person typing. Refer to them in the third person where it reads naturally, and never blend in details from anyone else.
+
+CANDIDATE PROFILE${s.person ? ` (${s.person})` : ""}:
+${coachProfileText(s).slice(0, 25000)}
+
+JOB: ${coachJobLabel(s)} (match score: ${s.score ?? "n/a"})
+JOB DESCRIPTION:
+${s.job_description.slice(0, 15000)}
+
+MATCH ANALYSIS: ${s.analysis ?? "not analysed yet"}
+
+${latest ? `CURRENT TAILORED CV (v${latest.version}):\n${latest.content}` : "No tailored CV generated yet."}`;
+
+  mutateSession(id, (session) => {
+    session.messages.push({ id: Date.now(), role: "user", content: message, created_at: now() });
+  });
+
+  const reply = await askClaude({
+    system,
+    maxTokens: 8000,
+    messages: [...history, { role: "user", content: message }],
+  });
+
+  return mutateSession(id, (session) => {
+    session.messages.push({ id: Date.now() + 1, role: "assistant", content: reply, created_at: now() });
+    let newCv = null;
+    const content = cvFromReply(reply, normalizeContact(session.contact));
+    if (content) {
+      const maxV = Math.max(0, ...session.cvs.map((c) => c.version));
+      newCv = { id: Date.now() + 2, version: maxV + 1, content, created_at: now() };
+      session.cvs.push(newCv);
     }
     return { reply, newCv };
   });
@@ -401,6 +602,38 @@ export async function localApi(
     if (parts[2] === "cv" && method === "POST") return generateCv(id);
     if (parts[2] === "chat" && method === "POST") return chat(id, body.message);
     if (parts[2] === "interview" && method === "POST") return generateInterviewPrep(id, body.stage);
+  }
+
+  if (parts[0] === "coach") {
+    if (parts.length === 1) {
+      if (method === "POST") return createCoachSession(body);
+      const db = loadDb();
+      return {
+        sessions: [...db.coach_sessions]
+          .map(normalizeSession)
+          .sort((a, b) => (a.updated_at < b.updated_at ? 1 : -1)),
+      };
+    }
+    const id = Number(parts[1]);
+    if (parts.length === 2) {
+      if (method === "DELETE") {
+        mutate((db) => {
+          db.coach_sessions = db.coach_sessions.filter((x) => x.id !== id);
+        });
+        return { ok: true };
+      }
+      if (method === "PATCH") {
+        return mutateSession(id, (session) => {
+          if ("person" in body) session.person = body.person ?? "";
+          if ("contact" in body) session.contact = normalizeContact(body.contact);
+          return { session };
+        });
+      }
+      return { session: sessionOr404(loadDb(), id) };
+    }
+    if (parts[2] === "cv" && method === "POST") return coachGenerateCv(id);
+    if (parts[2] === "interview" && method === "POST") return coachGeneratePrep(id, body.stage);
+    if (parts[2] === "chat" && method === "POST") return coachChat(id, body.message);
   }
 
   if (parts[0] === "contacts") {

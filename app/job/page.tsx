@@ -110,7 +110,7 @@ function JobPageInner() {
       {tab === "cv" && <CvTab jobId={params.id} job={job} cvs={cvs} reload={reload} />}
       {tab === "interview" && (
         <InterviewCoach
-          jobId={Number(params.id)}
+          apiPath={`/api/jobs/${params.id}`}
           job={job}
           preps={interviewPreps}
           reload={reload}

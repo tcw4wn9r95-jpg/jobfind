@@ -7,18 +7,48 @@ import { INTERVIEW_STAGES, InterviewPrep, parsePrep, prepToText } from "@/lib/in
 type PrepRecord = { id: number; stage: string; content: string; created_at: string };
 
 export function InterviewCoach({
-  jobId,
+  apiPath,
   job,
   preps,
   reload,
   onPractice,
+  person,
 }: {
-  jobId: number;
-  job: any;
+  /** Base path of the owning record, e.g. "/api/jobs/3" or "/api/coach/7". */
+  apiPath: string;
+  job: { title?: string; company?: string };
   preps: PrepRecord[];
   reload: () => void;
   onPractice: (stage: string) => void;
+  /** Set in coaching mode so the copy talks about them, not the reader. */
+  person?: string;
 }) {
+  // Coaching mode is the same pack, described in the third person.
+  const who = person ? (person.split(/[—–-]/)[0].trim() || "them") : "";
+  const copy = person
+    ? {
+        experience: `${who}'s real experience`,
+        theyAsk: "they'll ask",
+        askThem: `what ${who} should ask them`,
+        stageHint: `Each round is scored differently, so pick the stage ${who} is facing.`,
+        build: "Build their prep pack ✨",
+        building: "Building their prep…",
+        waiting: `Reading their CV, the job spec and the match analysis — usually 20–40 seconds.`,
+        grounded: `Everything is grounded in what ${who}'s CV actually says — no invented stories, and honest handling of the gaps they'll probe.`,
+        practice: "🎤 Run a mock interview",
+      }
+    : {
+        experience: "your real experience",
+        theyAsk: "they'll ask",
+        askThem: "what to ask them",
+        stageHint: "Each round is scored differently, so pick the stage you're facing.",
+        build: "Build my prep pack ✨",
+        building: "Building your prep…",
+        waiting: "Reading your profile, the job spec and your match analysis — usually 20–40 seconds.",
+        grounded:
+          "Everything is grounded in your actual profile — no invented stories, and honest handling of the gaps they'll probe.",
+        practice: "🎤 Practice with Claude",
+      };
   const [stage, setStage] = useState<string>(preps[0]?.stage ?? INTERVIEW_STAGES[1]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +60,7 @@ export function InterviewCoach({
     setBusy(true);
     setError(null);
     try {
-      await api(`/api/jobs/${jobId}/interview`, {
+      await api(`${apiPath}/interview`, {
         method: "POST",
         body: JSON.stringify({ stage }),
       });
@@ -44,7 +74,7 @@ export function InterviewCoach({
 
   function download() {
     if (!prep) return;
-    const text = prepToText(prep, job.title, job.company);
+    const text = prepToText(prep, job.title ?? "", job.company ?? "");
     const blob = new Blob([text], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -59,9 +89,9 @@ export function InterviewCoach({
       <section className="card mb-6 p-6">
         <h2 className="font-bold text-ink-900">Interview coach</h2>
         <p className="mt-1 max-w-2xl text-xs leading-relaxed text-ink-500">
-          A prep pack built only from your real experience: talking points, a STAR story bank,
-          the questions they&apos;ll ask, the hard challenges they&apos;ll push on, and what to
-          ask them. Each round is scored differently, so pick the stage you&apos;re facing.
+          A prep pack built only from {copy.experience}: talking points, a STAR story bank, the
+          questions {copy.theyAsk}, the hard challenges they&apos;ll push on, and {copy.askThem}.{" "}
+          {copy.stageHint}
         </p>
 
         <label className="label mt-4">Interview stage</label>
@@ -87,18 +117,12 @@ export function InterviewCoach({
 
         <div className="mt-4 flex flex-wrap gap-2">
           <button className="btn-primary" onClick={generate} disabled={busy}>
-            {busy ? (
-              <Spinner label="Building your prep…" />
-            ) : prep ? (
-              "Regenerate this stage"
-            ) : (
-              "Build my prep pack ✨"
-            )}
+            {busy ? <Spinner label={copy.building} /> : prep ? "Regenerate this stage" : copy.build}
           </button>
           {prep && (
             <>
               <button className="btn-secondary" onClick={() => onPractice(stage)}>
-                🎤 Practice with Claude
+                {copy.practice}
               </button>
               <button className="btn-secondary" onClick={download}>
                 ⬇ Download
@@ -109,7 +133,7 @@ export function InterviewCoach({
         {error && <p className="mt-3 text-sm font-medium text-rose-600">{error}</p>}
         {busy && (
           <p className="mt-3 text-xs text-ink-400 animate-pulseSoft">
-            Reading your profile, the job spec and your match analysis — usually 20–40 seconds.
+            {copy.waiting}
           </p>
         )}
       </section>
@@ -118,8 +142,7 @@ export function InterviewCoach({
         <div className="card p-10 text-center">
           <p className="text-lg font-bold text-ink-800">No prep pack for this stage yet</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-ink-500">
-            Pick the stage above and build one. Everything is grounded in your actual profile —
-            no invented stories, and honest handling of the gaps they&apos;ll probe.
+            Pick the stage above and build one. {copy.grounded}
           </p>
         </div>
       )}

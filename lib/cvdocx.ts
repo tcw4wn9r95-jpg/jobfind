@@ -10,18 +10,22 @@ import {
   TabStopType,
   TextRun,
 } from "docx";
-import { applyContact, normalizeContact } from "./contact";
+import { ContactDetails, applyContact, normalizeContact } from "./contact";
 import { CvData, cvToText, linkedinUrl, parseCv } from "./cvschema";
 import { loadDb } from "./localdb";
 
 /**
- * Contact details are always taken from the current profile at render time,
- * not from whatever was frozen into the stored CV. That repairs CVs generated
- * before contact details were deterministic, and means updating your phone
- * number updates every CV rather than only future ones.
+ * Contact details are taken at render time rather than from whatever was
+ * frozen into the stored CV. That repairs CVs generated before contact
+ * details were deterministic, and means updating a phone number updates
+ * every CV rather than only future ones.
+ *
+ * `override` MUST be passed when rendering a coached candidate's CV — without
+ * it this falls back to the app owner's own profile, which would stamp the
+ * owner's email and phone onto someone else's CV.
  */
-function withProfileContact(cv: CvData): CvData {
-  return applyContact(cv, normalizeContact(loadDb().profile?.contact));
+function withContact(cv: CvData, override?: ContactDetails): CvData {
+  return applyContact(cv, normalizeContact(override ?? loadDb().profile?.contact));
 }
 
 // Faithful reproduction of the reference template (CV_Diego_Casares_2026.docx):
@@ -267,11 +271,13 @@ export async function downloadCv(
   content: string,
   company: string,
   version: number,
-  format: "docx" | "md"
+  format: "docx" | "md",
+  /** Pass the coached person's contact details when rendering their CV. */
+  contact?: ContactDetails
 ) {
   const base = `CV-${(company || "company").replace(/[^\w-]+/g, "_")}-v${version}`;
   const parsed = parseCv(content);
-  const cv = parsed ? withProfileContact(parsed) : null;
+  const cv = parsed ? withContact(parsed, contact) : null;
   let blob: Blob;
   if (format === "docx") {
     const doc = cv ? buildTemplateDocx(cv) : legacyMarkdownDocx(content);

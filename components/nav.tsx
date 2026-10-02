@@ -9,6 +9,7 @@ const links = [
   { href: "/jobs", label: "Jobs & Matches", short: "Jobs", icon: "✦" },
   { href: "/pipeline", label: "Pipeline", short: "Pipeline", icon: "⬢" },
   { href: "/contacts", label: "People", short: "People", icon: "✉" },
+  { href: "/coach", label: "Coach Someone", short: "Coach", icon: "♜" },
   { href: "/settings", label: "Settings", short: "Setup", icon: "⚙" },
 ];
 
