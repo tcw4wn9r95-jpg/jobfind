@@ -2,6 +2,7 @@
 // Shapes mirror the SQL rows the original server version used, so the UI
 // components consume identical objects.
 
+import { CoachSession } from "./coach";
 import { ContactDetails, EMPTY_CONTACT, normalizeContact } from "./contact";
 
 export type Profile = {
@@ -101,6 +102,8 @@ export type Db = {
   interactions: Interaction[];
   settings: Settings;
   dismissed_leads: string[];
+  /** Self-contained coaching sessions for other people — see lib/coach.ts. */
+  coach_sessions: CoachSession[];
   nextId: number;
 };
 
@@ -124,6 +127,7 @@ function emptyDb(): Db {
     interactions: [],
     settings: { apiKey: "", model: "claude-sonnet-5" },
     dismissed_leads: [],
+    coach_sessions: [],
     nextId: 1,
   };
 }

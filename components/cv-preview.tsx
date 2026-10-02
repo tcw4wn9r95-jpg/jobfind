@@ -1,18 +1,25 @@
 "use client";
 
 import { Markdown } from "@/components/ui";
-import { applyContact, normalizeContact } from "@/lib/contact";
+import { ContactDetails, applyContact, normalizeContact } from "@/lib/contact";
 import { linkedinUrl, parseCv } from "@/lib/cvschema";
 import { loadDb } from "@/lib/localdb";
 
 /** On-screen approximation of the CV template (navy accents, small-caps
  *  section rules). Falls back to Markdown for legacy versions. */
-export function CvPreview({ content }: { content: string }) {
+export function CvPreview({
+  content,
+  contact,
+}: {
+  content: string;
+  /** Pass the coached person's contact details when previewing their CV. */
+  contact?: ContactDetails;
+}) {
   const parsed = parseCv(content);
   if (!parsed) return <Markdown text={content} />;
   // Contact comes from the current profile, matching the .docx output — see
   // withProfileContact in lib/cvdocx.ts.
-  const cv = applyContact(parsed, normalizeContact(loadDb().profile?.contact));
+  const cv = applyContact(parsed, normalizeContact(contact ?? loadDb().profile?.contact));
   const linkedin = linkedinUrl(cv.linkedin);
 
   return (
