@@ -2,12 +2,15 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { CvInput } from "@/components/cv-input";
 import { PageHeader, ScoreRing, Spinner, api, useApi } from "@/components/ui";
 
 export default function CoachPage() {
   const { data, loading, reload } = useApi<{ sessions: any[] }>("/api/coach");
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ person: "", cv: "", job_description: "" });
+  const EMPTY = { person: "", cv: "", job_url: "", job_description: "" };
+  const [form, setForm] = useState(EMPTY);
+  const [showPaste, setShowPaste] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,11 +21,14 @@ export default function CoachPage() {
     setError(null);
     try {
       await api("/api/coach", { method: "POST", body: JSON.stringify(form) });
-      setForm({ person: "", cv: "", job_description: "" });
+      setForm(EMPTY);
+      setShowPaste(false);
       setOpen(false);
       reload();
     } catch (e: any) {
       setError(e.message);
+      // A link that couldn't be read isn't a dead end: open the paste box.
+      if (e.data?.needsPaste) setShowPaste(true);
     } finally {
       setBusy(false);
     }
@@ -59,30 +65,53 @@ export default function CoachPage() {
             onChange={(e) => setForm((f) => ({ ...f, person: e.target.value }))}
           />
           <label className="label mt-4">Their CV</label>
-          <textarea
-            className="input min-h-[160px] text-xs"
-            placeholder="Paste their CV text here…"
+          <CvInput
             value={form.cv}
-            onChange={(e) => setForm((f) => ({ ...f, cv: e.target.value }))}
+            onChange={(cv) => setForm((f) => ({ ...f, cv }))}
+            placeholder="Paste their CV text here, or upload / drop a file…"
           />
-          <label className="label mt-4">Job description</label>
-          <textarea
-            className="input min-h-[160px] text-xs"
-            placeholder="Paste the full job description here…"
-            value={form.job_description}
-            onChange={(e) => setForm((f) => ({ ...f, job_description: e.target.value }))}
+
+          <label className="label mt-4">The job</label>
+          <input
+            className="input"
+            placeholder="https://… paste the job posting link"
+            value={form.job_url}
+            onChange={(e) => setForm((f) => ({ ...f, job_url: e.target.value }))}
           />
+          <p className="mt-1.5 text-xs text-ink-400">
+            The posting is read through a public reader (r.jina.ai) — only the link is sent, never
+            the CV.
+          </p>
+          <button
+            type="button"
+            className="mt-2 block text-xs font-semibold text-indigo-600 hover:underline"
+            onClick={() => setShowPaste((v) => !v)}
+          >
+            {showPaste ? "Hide" : "Or paste the job description text instead →"}
+          </button>
+          {showPaste && (
+            <textarea
+              className="input mt-2 min-h-[160px] text-xs"
+              placeholder="Paste the full job description here… (used instead of the link)"
+              value={form.job_description}
+              onChange={(e) => setForm((f) => ({ ...f, job_description: e.target.value }))}
+            />
+          )}
           {error && <p className="mt-3 text-sm font-medium text-rose-600">{error}</p>}
           <button
             className="btn-primary mt-4"
             onClick={create}
-            disabled={busy || form.cv.trim().length < 50 || form.job_description.trim().length < 100}
+            disabled={
+              busy ||
+              form.cv.trim().length < 50 ||
+              (!form.job_url.trim() && form.job_description.trim().length < 100)
+            }
           >
             {busy ? <Spinner label="Scoring the match…" /> : "Create session ✨"}
           </button>
           {busy && (
             <p className="mt-3 text-xs text-ink-400 animate-pulseSoft">
-              Comparing their CV against the posting — usually 10–20 seconds.
+              Reading the posting and comparing it with their CV — usually 10–30 seconds.
             </p>
           )}
         </section>
@@ -94,8 +123,9 @@ export default function CoachPage() {
         <div className="card p-10 text-center">
           <p className="text-lg font-bold text-ink-800">No coaching sessions yet</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-ink-500">
-            Paste someone&apos;s CV and a job description, and they get everything you get: a
-            scored match, a tailored CV in the same template, and a stage-aware interview pack.
+            Add someone&apos;s CV (upload it or paste it) and a job (a link or the description), and
+            they get everything you get: a scored match, a tailored CV in the same template, and a
+            stage-aware interview pack.
           </p>
         </div>
       ) : (

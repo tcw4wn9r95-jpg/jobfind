@@ -8,3 +8,6 @@ data/
 .DS_Store
 tsconfig.tsbuildinfo
 next-env.d.ts
+
+# copied from node_modules by scripts/copy-pdf-worker.mjs
+/public/pdf.worker.min.js

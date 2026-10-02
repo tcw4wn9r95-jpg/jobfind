@@ -173,12 +173,12 @@ function cvFromReply(reply: string, contact: ReturnType<typeof normalizeContact>
   }
 }
 
-async function addJob(body: { url?: string; description?: string }) {
-  const db = loadDb();
-  const profileText = profileContextAsText(db);
-  if (profileText.trim().length < 100) {
-    throw new ApiError("Add your CV in Profile first so I can score matches against it.");
-  }
+/**
+ * Pasted text wins; otherwise read the link. Either failure carries
+ * `needsPaste` so the UI can open the paste box instead of dead-ending.
+ * Shared by the owner's "add job" and by coaching sessions.
+ */
+async function resolveJobText(body: { url?: string; description?: string }) {
   let jobText = (body.description ?? "").trim();
   let pageTitle = "";
   if (!jobText && body.url) {
@@ -199,6 +199,16 @@ async function addJob(body: { url?: string; description?: string }) {
       { needsPaste: true }
     );
   }
+  return { jobText, pageTitle };
+}
+
+async function addJob(body: { url?: string; description?: string }) {
+  const db = loadDb();
+  const profileText = profileContextAsText(db);
+  if (profileText.trim().length < 100) {
+    throw new ApiError("Add your CV in Profile first so I can score matches against it.");
+  }
+  const { jobText, pageTitle } = await resolveJobText(body);
   const analysis = await runMatch(profileText, jobText, pageTitle);
   return mutate((db) => {
     const job: Job = {
@@ -410,15 +420,22 @@ function coachJobLabel(s: CoachSession): string {
 
 async function createCoachSession(body: any) {
   const cv = (body.cv ?? "").trim();
-  const jobDescription = (body.job_description ?? "").trim();
-  if (cv.length < 50) throw new ApiError("Paste their CV first (at least a few lines).");
-  if (jobDescription.length < 100) {
-    throw new ApiError("Paste the job description too — at least a short paragraph.");
+  const jobUrl = (body.job_url ?? "").trim();
+  if (cv.length < 50) throw new ApiError("Add their CV first — upload a file or paste the text.");
+  if (!jobUrl && (body.job_description ?? "").trim().length < 100) {
+    throw new ApiError("Add the job — paste a link, or paste the description text.", {
+      needsPaste: true,
+    });
   }
+  const { jobText: jobDescription, pageTitle } = await resolveJobText({
+    url: jobUrl,
+    description: body.job_description,
+  });
 
   const analysis = await runMatch(
     `CANDIDATE CV (provided by the person being coached):\n${cv}`,
-    jobDescription
+    jobDescription,
+    pageTitle
   );
 
   return mutate((db) => {
@@ -428,7 +445,8 @@ async function createCoachSession(body: any) {
         person: (body.person ?? "").trim(),
         cv,
         job_description: jobDescription,
-        job_title: analysis.title || "Untitled role",
+        job_url: jobUrl,
+        job_title: analysis.title || pageTitle || "Untitled role",
         company: analysis.company || "",
         location: analysis.location || "",
         // Their contact details, read from their own CV — never the owner's.

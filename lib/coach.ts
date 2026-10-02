@@ -39,6 +39,8 @@ export type CoachSession = {
   company: string;
   location: string;
   job_description: string;
+  /** The posting link, when the job was added by link rather than pasted. */
+  job_url: string;
   analysis: string | null;
   score: number | null;
   /** Their contact details — never the app owner's. */
@@ -59,6 +61,7 @@ export function newSession(id: number, fields: Partial<CoachSession>, timestamp:
     company: fields.company ?? "",
     location: fields.location ?? "",
     job_description: fields.job_description ?? "",
+    job_url: fields.job_url ?? "",
     analysis: null,
     score: null,
     contact: fields.contact ?? { ...EMPTY_CONTACT },
@@ -80,6 +83,7 @@ export function normalizeSession(s: Partial<CoachSession>): CoachSession {
     company: s.company ?? "",
     location: s.location ?? "",
     job_description: s.job_description ?? "",
+    job_url: s.job_url ?? "",
     analysis: s.analysis ?? null,
     score: s.score ?? null,
     contact: { ...EMPTY_CONTACT, ...(s.contact ?? {}) },
