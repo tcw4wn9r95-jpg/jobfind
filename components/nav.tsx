@@ -13,8 +13,13 @@ const links = [
   { href: "/settings", label: "Settings", short: "Setup", icon: "⚙" },
 ];
 
+/** A shared report is opened by other people — the owner's own navigation
+ *  has no meaning there, so both navs step aside on /report. */
+const isSharedReport = (pathname: string) => pathname.startsWith("/report");
+
 export function MobileNav() {
   const pathname = usePathname();
+  if (isSharedReport(pathname)) return null;
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 flex border-t border-ink-200/70 bg-white/90 backdrop-blur md:hidden"
@@ -42,6 +47,7 @@ export function MobileNav() {
 
 export function Nav() {
   const pathname = usePathname();
+  if (isSharedReport(pathname)) return null;
   return (
     <aside className="sticky top-0 hidden h-screen w-60 shrink-0 flex-col border-r border-ink-200/60 px-4 py-8 md:flex">
       <Link href="/" className="mb-10 flex items-center gap-2.5 px-2">

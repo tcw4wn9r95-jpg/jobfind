@@ -6,7 +6,9 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { Markdown, PageHeader, ScoreRing, Spinner, api, useApi } from "@/components/ui";
 import { CvPreview } from "@/components/cv-preview";
 import { InterviewCoach } from "@/components/interview-prep";
+import { ShareReport } from "@/components/share-report";
 import { downloadCv } from "@/lib/cvdocx";
+import { buildReport } from "@/lib/report";
 
 type Tab = "match" | "cv" | "interview" | "chat";
 
@@ -121,6 +123,18 @@ function MatchTab({ session, analysis }: { session: any; analysis: any }) {
         <ScoreRing score={session.score} size={120} />
         <p className="mt-3 text-sm font-bold text-ink-800">Match score</p>
         <p className="mt-2 text-sm leading-relaxed text-ink-600">{analysis.verdict}</p>
+        <div className="mt-4 w-full">
+          <ShareReport
+            report={buildReport({
+              person: session.person,
+              title: session.job_title,
+              company: session.company,
+              location: session.location,
+              score: session.score,
+              analysis,
+            })}
+          />
+        </div>
       </div>
       <div className="space-y-6 lg:col-span-2">
         <List title="Why they fit" items={analysis.strengths} marker="✓" />

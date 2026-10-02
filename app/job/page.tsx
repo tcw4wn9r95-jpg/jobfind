@@ -16,6 +16,8 @@ import {
 import { downloadCv } from "@/lib/cvdocx";
 import { CvPreview } from "@/components/cv-preview";
 import { InterviewCoach } from "@/components/interview-prep";
+import { ShareReport } from "@/components/share-report";
+import { buildReport } from "@/lib/report";
 
 type Tab = "match" | "cv" | "interview" | "chat" | "activity";
 
@@ -172,6 +174,17 @@ function MatchTab({
             I&apos;m applying — tailor my CV →
           </button>
         )}
+        <div className="mt-3 w-full">
+          <ShareReport
+            report={buildReport({
+              title: job.title,
+              company: job.company,
+              location: job.location,
+              score: job.score,
+              analysis,
+            })}
+          />
+        </div>
       </div>
       <div className="space-y-6 lg:col-span-2">
         <ListCard

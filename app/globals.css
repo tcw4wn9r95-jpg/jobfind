@@ -99,3 +99,33 @@ body {
 .prose-cv li { @apply text-sm leading-relaxed text-ink-700; }
 .prose-cv strong { @apply font-semibold text-ink-900; }
 .prose-cv hr { @apply my-4 border-ink-200; }
+
+/* Shared match report: on paper it should look like a document, not a
+   screenshot of the app — no page gradient, no card chrome, no buttons. */
+.no-print {
+  /* visible on screen; hidden by the print block below */
+}
+@media print {
+  body {
+    background: #fff !important;
+    background-image: none !important;
+  }
+  .no-print,
+  .app-splash {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  .report-sheet-wrap {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: 0 0 #0000 !important;
+  }
+  .report-sheet {
+    padding: 0 !important;
+  }
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+}
