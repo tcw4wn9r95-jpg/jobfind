@@ -1,14 +1,11 @@
 name: Scan for job leads
 
 on:
-  schedule:
-    # Deliberately NOT on the hour: GitHub's own docs warn that scheduled
-    # workflows fired exactly at :00 are the most likely to be delayed or
-    # dropped under load, since that's when every other repo's cron also
-    # fires. 17 past avoids that spike. First-ever scheduled run (2026-07-20
-    # 06:00 UTC, right after this workflow was merged) never appeared in
-    # the run history at all — consistent with exactly that failure mode.
-    - cron: "17 6 * * *" # daily ~06:17 UTC
+  # Daily scheduled scan cancelled 2026-11-10 at the owner's request.
+  # The workflow can still be run by hand from the Actions tab.
+  # To turn the automatic scan back on, restore:
+  #   schedule:
+  #     - cron: "17 6 * * *" # daily ~06:17 UTC
   workflow_dispatch:
 
 permissions:
