@@ -1,16 +1,42 @@
 {
-  "generated_at": "2026-11-10T15:00:21.496Z",
+  "generated_at": "2026-11-11T14:31:15.884Z",
   "leads": [
     {
-      "id": "1e7m8h3",
-      "title": "Senior Technical Product Manager, Rail Integrations (all genders)",
-      "company": "Distribusion Technologies",
+      "id": "1eu58uy",
+      "title": "Product Designer",
+      "company": "SkyCell AG",
       "location": "Remote job · Remote",
-      "url": "https://www.arbeitnow.com/jobs/companies/distribusion-technologies/remote-senior-technical-product-manager-rail-integrations-all-genders-berlin-161406",
-      "posted_at": "2026-11-10",
-      "snippet": "Distribusion is the world’s leading ground transportation marketplace and gives travellers seamless access to ground transportation online, from search to ticket purchase. We have built a cutting-edge B2B technology platform that connects bus, rail, and ferry operators in 70+ countries with the biggest online retailers, including Google Maps and Booking.com . We are shaping the future of travel and building the largest global network of transport providers and retailers. We are one of the fastest-growing startups in travel, backed by leading venture capital investors including TQ Ventures, Lig",
+      "url": "https://www.arbeitnow.nl/jobs/companies/skycell-ag/remote-product-designer-amsterdam-294295",
+      "posted_at": "2026-11-11",
+      "snippet": "Software is not just vital but a strategic cornerstone of our operations. We’re looking for a Product Designer to set the cross-application UX direction for our commercial software - from pharma cold-chain visibility that helps temperature-sensitive medicines move safely around the world, to ULD tracking for airlines. You’ll define a consistent, high-quality experience across our modules and applications and support our specialised designers in bringing that experience to life, while remaining hands-on in discovery, from the first user conversation through to the final UX. 📍 Location: We are ",
       "source": "arbeitnow",
-      "score": 62,
+      "score": 50,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "1usbk5v",
+      "title": "Generalist (Operations)",
+      "company": "Kairos Project",
+      "location": "Remote · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/kairos-project/remote-generalist-operations-195554",
+      "posted_at": "2026-11-11",
+      "snippet": "Take on the business and back-end operations that keep Kairos running: finances, payments, HR, compliance, and systems, plus support for our programs and Pathfinder groups. Note: This role description is a first draft. Scope, salary, and responsibilities may evolve as our plans develop over the coming weeks, and we’ll keep you in the loop about any changes if you apply. About Kairos Kairos is a nonprofit accelerating talent into AI safety and policy. In just over two years, we’ve trained 1,200+ people through our flagship programs: SPAR : The largest AI safety research fellowship, with 800+ me",
+      "source": "arbeitnow",
+      "score": 50,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "1jvf59d",
+      "title": "GTM Enablement - Product",
+      "company": "ElevenLabs",
+      "location": "Remote · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/elevenlabs/remote-gtm-enablement-product-353715",
+      "posted_at": "2026-11-11",
+      "snippet": "About ElevenLabs ElevenLabs is an AI research and product company transforming how we interact with technology. We launched in January 2023 with the first human-like AI voice model. Today, we serve millions of users and thousands of businesses - from fast-growing startups to large enterprises like Deutsche Telekom and Meta. Our investors are some of the world's most prominent, including Andreessen Horowitz, ICONIQ Growth and Sequoia. We've raised $781M in funding and our last valuation was $22B - multiples of 11, always. We have expanded from voice into three main platforms: ElevenAgents enabl",
+      "source": "arbeitnow",
+      "score": 45,
       "location_tier": "uncertain",
       "location_note": "Remote — region unclear, verify"
     }
