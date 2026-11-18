@@ -1,4 +1,31 @@
 {
-  "generated_at": "2026-11-17T16:12:45.974Z",
-  "leads": []
+  "generated_at": "2026-11-18T15:48:12.964Z",
+  "leads": [
+    {
+      "id": "ybr2ho",
+      "title": "Product Designer UX/UI (m/w/d), Teil- oder Vollzeit, Remote",
+      "company": "AZAV Pilot",
+      "location": "Berlin · Remote",
+      "url": "https://www.arbeitnow.com/jobs/companies/azav-pilot/product-designer-ux-ui-teil-oder-vollzeit-remote-berlin-492788",
+      "posted_at": "2026-11-18",
+      "snippet": "Über AZAV Pilot Unsere Vision: Jede(r) sollte lehren und lernen können. Mit AZAV Pilot können sich Bildungsanbieter in der Erwachsenenbildung auf das konzentrieren, was wirklich zählt: fantastische Kurse & Coachings für ihre Kundinnen und Kunden anzubieten, anstatt im Bürokratiesumpf zu versinken. Wir entwickeln das Betriebssystem für alles rund um die Verwaltung der Teilnehmenden, die Dokumentation von Anwesenheit und Klassenbuch sowie das Qualitätsmanagement. Wir sind profitabel, 100 % bootstrapped und suchen zum nächstmöglichen Zeitpunkt eine(n) Product Designer UX/UI (m/w/d). Wenn du es li",
+      "source": "arbeitnow",
+      "score": 40,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    },
+    {
+      "id": "1hpdngg",
+      "title": "Career Program Participant (m/w/d) – Exklusive Beta-Phase für Professionals",
+      "company": "Alvra Labs",
+      "location": "Zürich · Remote",
+      "url": "https://www.arbeitnow.ch/jobs/companies/alvra-labs/career-program-participant-exklusive-beta-phase-fur-professionals-zurich-480415",
+      "posted_at": "2026-11-17",
+      "snippet": "Wir sind Alvra Labs , ein Venture Studio mit Sitz in Basel. Wir entwickeln digitale Produkte und Ventures im Bereich KI und Zukunftstechnologien, die Menschen mehr Zeit, Wahlfreiheit und berufliche Selbstbestimmung ermöglichen. Das Problem & unser neuer Ansatz Der Arbeitsmarkt hat ein massives Matching-Problem: Qualifizierte Professionals schicken CVs an anonyme Portale, während Unternehmen nach genau diesen Talenten suchen – und sie im Rauschen nicht finden. Aus unserem Venture Studio heraus entwickeln wir aktuell ein neues Venture für inverses Headhunting : Ein persönlicher Career Coach arbe",
+      "source": "arbeitnow",
+      "score": 40,
+      "location_tier": "uncertain",
+      "location_note": "Remote — region unclear, verify"
+    }
+  ]
 }
